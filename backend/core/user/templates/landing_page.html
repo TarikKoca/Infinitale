@@ -1,0 +1,754 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}Eternalore - {% trans "AI Interactive Roleplaying & Gaming" %}{% endblock %}
+{% block head %}
+  <meta name="description" content="{% trans 'Create AI-powered interactive games and stories in minutes. No coding required. Jump into dynamic visual adventures with personalized characters and branching narratives.' %}">
+  <meta name="keywords" content="AI game creator, interactive Roleplaying, visual novel maker, AI story generator, game development, no-code gaming, AI adventure games, story games">
+  <meta name="author" content="Eternalore">
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ SITE_URL }}{{ request.path }}">
+  <meta property="og:title" content="Eternalore - {% trans 'AI Interactive Roleplaying & Gaming' %}">
+  <meta property="og:description" content="{% trans 'Create AI-powered interactive games and stories in minutes. No coding required. Jump into dynamic visual adventures.' %}">
+  <meta property="og:image" content="{{ SITE_URL }}/static/images/logo.png">
+  <meta property="og:site_name" content="Eternalore">
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="{{ SITE_URL }}{{ request.path }}">
+  <meta property="twitter:title" content="Eternalore - {% trans 'AI Interactive Roleplaying & Gaming' %}">
+  <meta property="twitter:description" content="{% trans 'Create AI-powered interactive games and stories in minutes. No coding required. Jump into dynamic visual adventures.' %}">
+  <meta property="twitter:image" content="{{ SITE_URL }}/static/images/logo.png">
+  <!-- Additional font for landing page -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+  <!-- Performance hints -->
+  <link rel="preload" href="{% static 'images/hero_bg_landing.png' %}" as="image">
+  <style>
+    .landing-hero-bg { 
+      background-image: url('{% static "images/hero_bg_landing.png" %}'); 
+      background-size: cover; 
+      background-position: center; 
+      background-attachment: scroll; 
+    }
+  </style>
+{% endblock %}
+{% block content %}
+<div class="bg-slate-50 overflow-x-hidden max-w-full page-loading m-0">
+
+  <!-- Hero Section with Background -->
+  <div class="relative min-h-screen bg-cover bg-center landing-hero-bg">
+    <!-- Hero Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/60"></div>
+    
+    <!-- Navbar -->
+    <nav id="navbar" data-static-navbar class="fixed top-0 left-0 right-0 z-50 select-none navbar-default navbar-contrast-light rounded-3xl" role="navigation" aria-label="Main navigation">
+      <div class="flex justify-between items-center" id="nav-content">
+        <!-- Logo -->
+        <div class="flex flex-col justify-start items-center">
+          <div id="logo-container" class="flex flex-row justify-start items-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2">
+            <img class="landing-logo h-10 md:h-12 w-10 md:w-12 drop-shadow-lg" src="{% static 'images/logo_black.png' %}" alt="Eternalore Logo" loading="lazy">
+          </div>
+        </div>
+        
+        <!-- Navbar Buttons (visible on all viewports) -->
+        <div class="flex items-center justify-center space-x-3">
+          <div class="nav-button-container flex items-center gap-2">
+            {% if request.user.is_authenticated %}
+              {% if not HAS_HOME %}
+                <a href="{% url 'pricing' %}" class="bg-purple-600/80 hover:bg-purple-600 text-white font-semibold px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-purple-400/50 select-none cursor-pointer" aria-label="Upgrade">
+                  <span>Upgrade</span>
+                </a>
+              {% endif %}
+              <a href="{% url 'logout' %}" class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-600/80 hover:bg-red-600 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-red-400/50 select-none cursor-pointer" aria-label="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+              </a>
+            {% else %}
+              <a href="{% url 'login' %}" class="bg-white/10 backdrop-blur-sm border border-white/30 hover:bg-white/20 hover:border-white/40 text-white font-semibold px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-white/50 select-none cursor-pointer" aria-label="{% trans 'Sign in to account' %}">
+                <span>{% trans 'Sign In' %}</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        
+        
+      </div>
+      
+      
+    </nav>
+    
+    <!-- Hero Section -->
+    <header id="main-content" class="relative z-30 flex items-end min-h-screen px-4 md:px-8 pt-12 pb-10 md:pt-16 md:pb-12" role="main" aria-label="Hero">
+      <div class="max-w-6xl w-full ml-4 md:ml-28 transform -translate-y-6 md:-translate-y-10">
+        <h1 class="text-white flex flex-row items-start justify-start text-5xl md:text-7xl font-bold loading-fade leading-tight text-left mb-2 md:mb-3">{% trans 'Imagine, Start Playing' %}</h1>
+        <p class="text-2xl md:text-4xl text-white/90 mb-8 md:mb-12 max-w-3xl loading-fade text-left">{% trans 'Experience The Future Of Roleplaying With AI.' %}</p>
+        <div class="flex flex-col sm:flex-row items-start justify-start gap-4 md:gap-6 loading-fade mb-4">
+          <div class="relative">
+            {% if request.user.is_authenticated and HAS_HOME %}
+            <a href="{% url 'player_home' %}" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-600 text-white text-2xl md:text-3xl font-semibold px-10 py-4 h-16 md:h-18 rounded-xl shadow-lg transition-all duration-500 flex items-center whitespace-nowrap select-none cursor-pointer hover:shadow-xl hover:scale-[1.02] ring-2 ring-red-400/20" aria-label="{% trans 'Go to home' %}" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Hero Go Home'})">
+              <span class="flex items-center">
+                <span class="mr-2">{% trans 'Go Home' %}</span>
+                <i class="fa-solid fa-home ml-2 text-lg md:text-xl leading-none align-middle"></i>
+              </span>
+            </a>
+            {% else %}
+            <a href="{% url 'register' %}" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-600 text-white text-2xl md:text-3xl font-semibold px-10 py-4 h-16 md:h-18 rounded-xl shadow-lg transition-all duration-500 flex items-center whitespace-nowrap select-none cursor-pointer hover:shadow-xl hover:scale-[1.02] ring-2 ring-red-400/20" aria-label="{% trans 'Start Free' %}" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Hero Start Free'})">
+              <span class="flex items-center">
+                <span class="mr-2">{% trans 'Start Free' %}</span>
+                <i class="fa-solid fa-arrow-right ml-2 text-lg md:text-xl leading-none align-middle"></i>
+              </span>
+            </a>
+            <div class="text-white/60 mt-2 text-center select-none">{% trans 'No Credit Card Required' %}</div>
+            {% endif %}
+          </div>
+
+          <a href="{% url 'pricing' %}" class="bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 hover:border-white/40 text-white text-2xl md:text-3xl font-semibold px-10 py-4 h-16 md:h-18 rounded-2xl shadow-lg transition-all duration-300 flex items-center select-none cursor-pointer hover:shadow-xl hover:scale-[1.02]" aria-label="{% trans 'Plans' %}" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Hero Plans'})">
+            {% trans 'Plans' %}
+            <i class="fa-solid fa-arrow-right ml-2 text-lg md:text-xl leading-none align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  
+
+  <!-- Demo Steps Section -->
+  <section id="demo" class="py-16 md:py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12 relative">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 fade-in-up">{% trans "How It Works" %}</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">{% trans "Start in Three Simple Steps" %}</p>
+      </div>
+      
+      <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+          <div class="how-step opacity-0 translate-y-4 text-center p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-all duration-500 border border-blue-100 hover:border-blue-200 hover:shadow-lg group">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <i class="fa-solid fa-book-open text-white text-2xl"></i>
+            </div>
+            <h3 class="text-gray-800 font-bold text-xl">{% trans "Choose a Story" %}</h3>
+            <p class="text-gray-600 mt-2 w-full">{% trans "Pick a genre or write your own prompt." %}</p>
+          </div>
+          <div class="how-step opacity-0 translate-y-4 text-center p-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition-all duration-500 border border-emerald-100 hover:border-emerald-200 hover:shadow-lg group">
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <i class="fa-solid fa-wand-magic-sparkles text-white text-2xl"></i>
+            </div>
+            <h3 class="text-gray-800 font-bold text-xl">{% trans "Watch It Come Alive" %}</h3>
+            <p class="text-gray-600 mt-2">{% trans "AI builds your story, visuals, and audio." %}</p>
+          </div>
+          <div class="how-step opacity-0 translate-y-4 text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-500 border border-purple-100 hover:border-purple-200 hover:shadow-lg group">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <i class="fa-solid fa-gamepad text-white text-2xl"></i>
+            </div>
+            <h3 class="text-gray-800 font-bold text-xl">{% trans "Jump In & Play" %}</h3>
+            <p class="text-gray-600 mt-2">{% trans "Choose, see, and hear your story in real time." %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-16 md:py-20 bg-gradient-to-br from-slate-200 via-blue-200/50 to-purple-200/50 overflow-hidden border-y border-slate-300/70">
+    <div class="container mx-auto px-6 md:px-8">
+      <div class="text-center mb-6 md:mb-8">
+        <h2 class="text-3xl md:text-5xl font-bold text-slate-700 mb-6 md:mb-8 fade-in-up">{% trans "Why Players Keep Coming Back" %}</h2>
+        <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+          <span class="px-3 py-1.5 rounded-full bg-white/70 border border-slate-200 text-sm text-slate-700"><i class="fa-solid fa-star text-amber-500 mr-1"></i>{% trans "Highly Rated" %}</span>
+          <span class="px-3 py-1.5 rounded-full bg-white/70 border border-slate-200 text-sm text-slate-700"><i class="fa-solid fa-clock mr-1 text-blue-500"></i>{% trans "Deep, immersive sessions" %}</span>
+          <span class="px-3 py-1.5 rounded-full bg-white/70 border border-slate-200 text-sm text-slate-700"><i class="fa-solid fa-arrows-rotate mr-1 text-emerald-500"></i>{% trans "Players return for more" %}</span>
+        </div>
+      </div>
+      
+      <!-- Mobile Carousel -->
+      <div class="md:hidden max-w-sm mx-auto">
+        <div class="testimonial-carousel relative">
+          <div class="testimonial-slides flex transition-transform duration-300 ease-in-out" id="testimonial-slider">
+            <div class="min-w-full px-2">
+              <div class="bg-gradient-to-br from-white to-blue-50/50 p-6 rounded-3xl shadow-lg border border-blue-100 flex flex-col justify-between h-full">
+                <div class="mb-4 text-amber-500">
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-slate-600 mb-6 italic">"It felt like the story was reacting to my every choice. I’ve never experienced anything like it."</p>
+                <div class="flex items-center gap-3">
+                  <img src="{% static 'images/user.png' %}" alt="User avatar" class="w-8 h-8 rounded-full border border-slate-200">
+                  <div>
+                    <p class="font-semibold text-slate-700">John Mikel</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="min-w-full px-2">
+              <div class="bg-gradient-to-br from-white to-emerald-50/50 p-6 rounded-3xl shadow-lg border border-emerald-100 flex flex-col justify-between h-full">
+                <div class="mb-4 text-amber-500">
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-slate-600 mb-6 italic text-lg leading-relaxed">"Within minutes, I was completely immersed. It’s like reading a novel that you’re actually inside of."</p>
+                <div class="flex items-center gap-3">
+                  <img src="{% static 'images/user.png' %}" alt="User avatar" class="w-8 h-8 rounded-full border border-slate-200">
+                  <div>
+                    <p class="font-bold text-slate-800 text-lg">Mert Rüzgar</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="min-w-full px-2">
+              <div class="bg-gradient-to-br from-white to-purple-50/50 p-6 rounded-3xl shadow-lg border border-purple-100 flex flex-col justify-between h-full">
+                <div class="mb-4 text-amber-500">
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-slate-600 mb-6 italic text-lg leading-relaxed">"I tried the demo out of curiosity… now I can’t stop playing."</p>
+                <div class="flex items-center gap-3">
+                  <img src="{% static 'images/user.png' %}" alt="User avatar" class="w-8 h-8 rounded-full border border-slate-200">
+                  <div>
+                    <p class="font-bold text-slate-800 text-lg">Amanda Johnson</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Carousel Controls -->
+          <div class="flex justify-center items-center mt-6 space-x-4">
+            <button id="prev-testimonial" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-slate-600 hover:bg-white/30 transition-all">
+              <i class="fa-solid fa-chevron-left text-lg leading-none"></i>
+            </button>
+            
+            <div class="flex space-x-2" id="testimonial-indicators">
+              <!-- Indicators will be generated by JS -->
+            </div>
+            
+            <button id="next-testimonial" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-slate-600 hover:bg-white/30 transition-all">
+              <i class="fa-solid fa-chevron-right text-lg leading-none"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Desktop Grid -->
+      <div class="hidden md:block">
+      <div class="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto items-stretch">
+        <div class="bg-gradient-to-br from-white to-blue-50/50 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between h-full border border-blue-100 group hover:scale-[1.02]">
+          <div class="mb-4 text-amber-500">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <p class="text-slate-600 mb-6 italic">"It felt like the story was reacting to my every choice. I’ve never experienced anything like it."</p>
+          <div class="flex items-center gap-3">
+            <img src="{% static 'images/user.png' %}" alt="User avatar" class="w-9 h-9 rounded-full border border-slate-200">
+            <div>
+              <p class="font-semibold text-slate-700">John Mikel</p>
+            </div>
+          </div>
+          </div>
+          
+        <div class="bg-gradient-to-br from-white to-emerald-50/50 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between h-full border border-emerald-100 group hover:scale-[1.02]">
+          <div class="mb-4 text-amber-500">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <p class="text-slate-600 mb-6 italic text-lg leading-relaxed">"Within minutes, I was completely immersed. It’s like reading a novel that you’re actually inside of."</p>
+          <div class="flex items-center gap-3">
+            <img src="{% static 'images/user.png' %}" alt="User avatar" class="w-9 h-9 rounded-full border border-slate-200">
+            <div>
+              <p class="font-bold text-slate-800 text-lg">Mert Rüzgar</p>
+            </div>
+          </div>
+          </div>
+          
+        <div class="bg-gradient-to-br from-white to-purple-50/50 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between h-full border border-purple-100 group hover:scale-[1.02]">
+          <div class="mb-4 text-amber-500">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <p class="text-slate-600 mb-6 italic text-lg leading-relaxed">"I tried the demo out of curiosity… now I can’t stop playing."</p>
+          <div class="flex items-center gap-3">
+            <img src="{% static 'images/user.png' %}" alt="User avatar" class="w-9 h-9 rounded-full border border-slate-200">
+            <div>
+              <p class="font-bold text-slate-800 text-lg">Amanda Johnson</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-16 md:py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 fade-in-up">{% trans "Why You'll Love Eternalore" %}</h2>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="fade-in-up bg-gradient-to-br from-white to-blue-50/50 p-8 rounded-2xl text-center border border-blue-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 group hover:scale-[1.02]">
+          <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+            <i class="fa-solid fa-shuffle text-white text-4xl"></i>
+          </div>
+          <h4 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 transition-colors">{% trans "Stories Adapt" %}</h4>
+          <p class="text-gray-600 text-lg leading-relaxed">{% trans "Your choices truly matter. Every scene adapts to your decisions in real time." %}</p>
+        </div>
+        
+        <div class="fade-in-up bg-gradient-to-br from-white to-emerald-50/50 p-8 rounded-2xl text-center border border-emerald-100 hover:border-emerald-200 hover:shadow-xl transition-all duration-300 group hover:scale-[1.02]">
+          <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+            <i class="fa-solid fa-infinity text-white text-4xl"></i>
+          </div>
+          <h4 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-emerald-600 transition-colors">{% trans "Endless Worlds" %}</h4>
+          <p class="text-gray-600 text-lg leading-relaxed">{% trans "From detective mysteries to epic fantasies, explore countless genres and worlds." %}</p>
+        </div>
+        
+        <div class="fade-in-up bg-gradient-to-br from-white to-purple-50/50 p-8 rounded-2xl text-center border border-purple-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group hover:scale-[1.02]">
+          <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+            <i class="fa-solid fa-headset text-white text-4xl"></i>
+          </div>
+          <h4 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-purple-600 transition-colors">{% trans "Fully Immersive" %}</h4>
+          <p class="text-gray-600 text-lg leading-relaxed">{% trans "Experience your story with vivid visuals, cinematic sound effects, and narrated dialogue." %}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="py-20 md:py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-blue-500/10"></div>
+    <div class="container mx-auto px-6 text-center relative z-10">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">{% trans "Ready to Bring Your Dreams to Life?" %}</h2>
+        <p class="text-2xl text-slate-300 mb-12 leading-relaxed max-w-3xl mx-auto">{% trans "Join thousands of players who are already roleplaying with AI" %}</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+          <div class="flex flex-col sm:flex-row items-start justify-start gap-4 md:gap-6 loading-fade mb-4">
+            <div class="relative">
+              {% if request.user.is_authenticated and HAS_HOME %}
+              <a href="{% url 'player_home' %}" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-600 text-white text-2xl md:text-3xl font-semibold px-10 py-4 h-16 md:h-18 rounded-xl shadow-lg transition-all duration-500 flex items-center whitespace-nowrap select-none cursor-pointer hover:shadow-xl hover:scale-[1.02] ring-2 ring-red-400/20" aria-label="{% trans 'Go to home' %}" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'CTA Go Home'})">
+                <span class="flex items-center">
+                  <span class="mr-2">{% trans 'Go Home' %}</span>
+                  <i class="fa-solid fa-home ml-2 text-lg md:text-xl leading-none align-middle"></i>
+                </span>
+              </a>
+              {% else %}
+              <a href="{% url 'register' %}" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-600 text-white text-2xl md:text-3xl font-semibold px-10 py-4 h-16 md:h-18 rounded-xl shadow-lg transition-all duration-500 flex items-center whitespace-nowrap select-none cursor-pointer hover:shadow-xl hover:scale-[1.02] ring-2 ring-red-400/20" aria-label="{% trans 'Start Free' %}" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'CTA Start Free'})">
+                <span class="flex items-center">
+                  <span class="mr-2">{% trans 'Start Free' %}</span>
+                  <i class="fa-solid fa-arrow-right ml-2 text-lg md:text-xl leading-none align-middle"></i>
+                </span>
+              </a>
+              <div class="text-white/60 mt-2 text-center select-none">{% trans "No Credit Card Required" %}</div>
+              {% endif %}
+            </div>
+  
+            <a href="{% url 'pricing' %}" class="bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 hover:border-white/40 text-white text-2xl md:text-3xl font-semibold px-10 py-4 h-16 md:h-18 rounded-2xl shadow-lg transition-all duration-300 flex items-center select-none cursor-pointer hover:shadow-xl hover:scale-[1.02]" aria-label="{% trans 'Plans' %}" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Hero Plans'})">
+              {% trans 'Plans' %}
+              <i class="fa-solid fa-arrow-right ml-2 text-lg md:text-xl leading-none align-middle"></i>
+            </a>
+          </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-24 bg-gradient-to-br from-slate-100 via-blue-50 to-teal-50">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-slate-800 mb-6 fade-in-up">Frequently Asked Questions</h2>
+        <p class="text-xl text-slate-600 max-w-3xl mx-auto fade-in-up">Everything you need to know about Eternalore</p>
+      </div>
+      
+      <div class="max-w-4xl mx-auto">
+        <div class="space-y-8">
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>How does it work?</span>
+              <i class="fa-solid fa-chevron-down text-base text-slate-500 leading-none transition-transform duration-200 group-open:rotate-180"></i>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">
+              We use AI to generate complete narratives. Simply pick what you want play a story in real-time.
+            </div>
+          </details>
+
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>Do I need any programming experience?</span>
+              <i class="fa-solid fa-chevron-down text-base text-slate-500 leading-none transition-transform duration-200 group-open:rotate-180"></i>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">
+              Not at all! Our platform is designed for everyone. No coding, no learning - just play.
+            </div>
+          </details>
+
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>What types of games can I create?</span>
+              <i class="fa-solid fa-chevron-down text-base text-slate-500 leading-none transition-transform duration-200 group-open:rotate-180"></i>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">
+              You can play any genre: fantasy RPGs, sci-fi adventures, mystery detective stories, romantic novels and more. For visuals, you can choose from anime and cartoon to realistic aesthetics.
+            </div>
+          </details>
+
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>How long does it take to create a game?</span>
+              <i class="fa-solid fa-chevron-down text-base text-slate-500 leading-none transition-transform duration-200 group-open:rotate-180"></i>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">
+              Usually games can be generated in minutes! You can start playing immediately and expand your story as you go.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-b from-slate-800 to-slate-900 text-slate-300 py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center mb-6">
+            <img class="landing-logo h-10 w-10 mr-3" src="{% static 'images/logo_black.png' %}" alt="Eternalore Logo" loading="lazy">
+            <span class="text-2xl font-bold text-white">Eternalore</span>
+          </div>
+          <p class="text-slate-400 mb-6">{% trans "AI-powered interactive Roleplaying that brings your imagination to life." %}</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-slate-400 hover:text-white transition-colors" aria-label="Twitter">
+              <i class="fa-brands fa-x-twitter text-2xl leading-none align-middle"></i>
+            </a>
+            <a href="#" class="text-slate-400 hover:text-white transition-colors" aria-label="Discord">
+              <i class="fa-brands fa-discord text-2xl leading-none align-middle"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold mb-4">{% trans "Product" %}</h3>
+          <ul class="space-y-2">
+            <li><a href="#features" class="hover:text-white transition-colors">{% trans "Features" %}</a></li>
+            <li><a href="#pricing" class="hover:text-white transition-colors">{% trans "Pricing" %}</a></li>
+            <li><a href="{% url 'pricing' %}" class="hover:text-white transition-colors">{% trans "Pricing" %}</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold mb-4">{% trans "Support" %}</h3>
+          <ul class="space-y-2">
+             <li><a href="{% url 'support' %}" class="hover:text-white transition-colors">{% trans "Help Center" %}</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold mb-4">{% trans "Company" %}</h3>
+          <ul class="space-y-2">
+             <li><a href="{% url 'privacy' %}" class="hover:text-white transition-colors">{% trans "Privacy" %}</a></li>
+             <li><a href="{% url 'terms' %}" class="hover:text-white transition-colors">{% trans "Terms" %}</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-slate-700 mt-12 pt-8 text-center">
+        <p class="text-slate-400">&copy; 2025 Eternalore. {% trans "All rights reserved. Made with passion." %}</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Robust page-loading cleanup to avoid hidden content if any script fails early
+    window.addEventListener('load', function() {
+      try {
+        const root = document.querySelector('.page-loading');
+        if (root) root.classList.remove('page-loading');
+      } catch (_) {}
+    });
+    // Navbar scroll effect - clean and simple
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    (function() {
+      // Landing-only: Contrast toggle based on hero scroll position (no navbar bg changes)
+      try {
+        const nav = document.getElementById('navbar');
+        const hero = document.querySelector('.landing-hero-bg');
+        if (nav && hero) {
+          function updateContrast() {
+            const navH = nav.offsetHeight || 0;
+            const threshold = Math.max(0, (hero.offsetHeight || 0) - navH);
+            const useDark = window.scrollY >= threshold;
+            if (useDark) {
+              if (!nav.classList.contains('navbar-contrast-dark')) {
+                nav.classList.add('navbar-contrast-dark');
+                nav.classList.remove('navbar-contrast-light');
+              }
+            } else {
+              if (!nav.classList.contains('navbar-contrast-light')) {
+                nav.classList.add('navbar-contrast-light');
+                nav.classList.remove('navbar-contrast-dark');
+              }
+            }
+          }
+          updateContrast();
+          window.addEventListener('scroll', updateContrast, { passive: true });
+          window.addEventListener('resize', updateContrast);
+        }
+      } catch(_) {}
+
+      const sliderEl = document.getElementById('testimonial-slider');
+      if (!sliderEl) return;
+      const prevBtnEl = document.getElementById('prev-testimonial');
+      const nextBtnEl = document.getElementById('next-testimonial');
+      const indicatorsEl = document.getElementById('testimonial-indicators');
+      const carouselEl = document.querySelector('.testimonial-carousel');
+      const slides = Array.from(sliderEl.children);
+      let currentIndex = 0;
+      let autoTimer = null;
+
+      function renderIndicators() {
+        if (!indicatorsEl) return;
+        indicatorsEl.innerHTML = '';
+        slides.forEach((_, i) => {
+          const dot = document.createElement('button');
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-gray-300 opacity-70 transition-all';
+          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.addEventListener('click', () => {
+            currentIndex = i;
+            update();
+          });
+          indicatorsEl.appendChild(dot);
+        });
+      }
+
+      function update() {
+        sliderEl.style.transform = `translateX(-${currentIndex * 100}%)`;
+        if (!indicatorsEl) return;
+        Array.from(indicatorsEl.children).forEach((dot, i) => {
+          if (i === currentIndex) {
+            dot.classList.add('bg-slate-700', 'opacity-100', 'scale-125');
+            dot.classList.remove('bg-gray-300', 'opacity-70');
+          } else {
+            dot.classList.remove('bg-slate-700', 'opacity-100', 'scale-125');
+            dot.classList.add('bg-gray-300', 'opacity-70');
+          }
+        });
+      }
+
+      function next() {
+        currentIndex = (currentIndex + 1) % slides.length;
+        update();
+      }
+
+      function prev() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        update();
+      }
+
+      function startAutoRotate(){ if (autoTimer || slides.length <= 1) return; autoTimer = setInterval(next, 5000); }
+      function stopAutoRotate(){ if (!autoTimer) return; clearInterval(autoTimer); autoTimer = null; }
+
+      let startX = 0;
+      let isDragging = false;
+      sliderEl.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+      }, { passive: true });
+      sliderEl.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const dx = e.touches[0].clientX - startX;
+        if (Math.abs(dx) > 40) {
+          if (dx < 0) { next(); } else { prev(); }
+          isDragging = false;
+        }
+      }, { passive: true });
+      sliderEl.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      if (prevBtnEl) prevBtnEl.addEventListener('click', prev);
+      if (nextBtnEl) nextBtnEl.addEventListener('click', next);
+
+      // Auto-rotate when carousel visible; pause on interaction
+      try {
+        if (carouselEl && 'IntersectionObserver' in window) {
+          const obs = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) { startAutoRotate(); }
+              else { stopAutoRotate(); }
+            });
+          }, { threshold: 0.3 });
+          obs.observe(carouselEl);
+          carouselEl.addEventListener('mouseenter', stopAutoRotate);
+          carouselEl.addEventListener('mouseleave', startAutoRotate);
+          carouselEl.addEventListener('touchstart', stopAutoRotate, { passive: true });
+          carouselEl.addEventListener('touchend', startAutoRotate, { passive: true });
+        }
+      } catch(_) {}
+
+      renderIndicators();
+      update();
+    })();
+
+    // On-scroll reveal for How It Works steps
+    (function(){
+      try {
+        const steps = document.querySelectorAll('.how-step');
+        if (!steps.length || !('IntersectionObserver' in window)) return;
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0','translate-y-4');
+              entry.target.classList.add('opacity-100','translate-y-0');
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.2 });
+        steps.forEach((el) => obs.observe(el));
+      } catch(_) {}
+    })();
+
+    // Mini preview crossfade (lightweight GIF-like effect)
+    (function(){
+      try {
+        const imgA = document.getElementById('howPreviewA');
+        const imgB = document.getElementById('howPreviewB');
+        const card = document.querySelector('.how-preview');
+        if (!imgA || !imgB || !card) return;
+
+        const sources = [
+          '{% static "demo/Fantasy/image/scene1_base.jpg" %}',
+          '{% static "demo/Fantasy/image/scene2_base.jpg" %}',
+          '{% static "demo/Fantasy/image/scene3_base.jpg" %}',
+          '{% static "demo/Fantasy/image/scene4_base.jpg" %}',
+          '{% static "demo/Fantasy/image/scene5_base.jpg" %}',
+        ];
+
+        // Preload silently
+        try { sources.forEach(src => { const i = new Image(); i.src = src; }); } catch(_) {}
+
+        let current = 0;
+        let showingA = true;
+        let timer = null;
+
+        function step(){
+          const nextIndex = (current + 1) % sources.length;
+          const nextSrc = sources[nextIndex];
+          const show = showingA ? imgB : imgA;
+          const hide = showingA ? imgA : imgB;
+          show.src = nextSrc;
+          void show.offsetWidth; // ensure transition applies
+          show.classList.remove('opacity-0');
+          show.classList.add('opacity-100');
+          hide.classList.remove('opacity-100');
+          hide.classList.add('opacity-0');
+          showingA = !showingA;
+          current = nextIndex;
+        }
+
+        function start(){ if (!timer) { timer = setInterval(step, 2800); } }
+        function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+
+        if ('IntersectionObserver' in window) {
+          const obs = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => { entry.isIntersecting ? start() : stop(); });
+          }, { threshold: 0.3 });
+          obs.observe(card);
+        } else {
+          start();
+        }
+        card.addEventListener('mouseenter', stop);
+        card.addEventListener('mouseleave', start);
+        card.addEventListener('touchstart', stop, { passive: true });
+        card.addEventListener('touchend', start, { passive: true });
+      } catch(_) {}
+    })();
+
+    // Checkbox animasyonu
+    document.querySelectorAll('.checkbox-btn').forEach(btn => {
+      const input = btn.querySelector('input[type="checkbox"]');
+      const svg = btn.querySelector('svg.checkmark');
+      const path = svg.querySelector('path');
+      input.addEventListener('change', function () {
+        if (input.checked) {
+          path.style.transition = 'stroke-dashoffset 0.3s cubic-bezier(.4,2,.6,1), opacity 0.2s';
+          path.style.strokeDashoffset = 0;
+          path.style.opacity = 1;
+          btn.style.transition = 'background-color 0.3s cubic-bezier(.4,2,.6,1)';
+          btn.style.backgroundColor = 'rgba(239,246,255,1)'; // Tailwind blue-50
+        } else {
+          path.style.transition = 'stroke-dashoffset 0.3s cubic-bezier(.4,2,.6,1), opacity 0.2s';
+          path.style.strokeDashoffset = 24;
+          path.style.opacity = 0;
+          btn.style.transition = 'background-color 0.3s cubic-bezier(.4,2,.6,1)';
+          btn.style.backgroundColor = 'rgba(239,246,255,0)';
+        }
+      });
+      // Başlangıç durumu
+      if (input.checked) {
+        path.style.strokeDashoffset = 0;
+        path.style.opacity = 1;
+        btn.style.transition = 'background-color 0.3s cubic-bezier(.4,2,.6,1)';
+        btn.style.backgroundColor = 'rgba(239,246,255,1)';
+      } else {
+        path.style.strokeDashoffset = 24;
+        path.style.opacity = 0;
+        btn.style.transition = 'background-color 0.3s cubic-bezier(.4,2,.6,1)';
+        btn.style.backgroundColor = 'rgba(239,246,255,0)';
+      }
+    });
+
+    // Make FAQ cards fully clickable
+    document.addEventListener('DOMContentLoaded', function() {
+      const faqCards = document.querySelectorAll('.faq-card');
+      
+      faqCards.forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          // Don't interfere if clicking directly on the summary element or its children
+          const summary = card.querySelector('summary');
+          if (summary && summary.contains(e.target)) {
+            return; // Let the browser handle the default summary click
+          }
+          
+          // If clicking elsewhere on the card, toggle the details element
+          if (card.hasAttribute('open')) {
+            card.removeAttribute('open');
+          } else {
+            card.setAttribute('open', '');
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}

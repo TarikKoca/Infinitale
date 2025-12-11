@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Too Many Requests" %}{% endblock %}
+{% block content %}
+<main class="min-h-screen flex flex-col items-center justify-center text-center p-6">
+  <h1 class="text-4xl font-bold mb-4">{% trans "You’re going too fast" %}</h1>
+  <p class="text-lg mb-6">{% blocktrans %}Please wait <span id="retryCountdown">{{ retry_after }}</span> seconds and try again.{% endblocktrans %}</p>
+  <a href="{{ request.path }}" class="px-5 py-3 rounded-lg font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-600">{% trans "Retry" %}</a>
+</main>
+<script>
+  (function(){
+    try {
+      const seconds = Number('{{ retry_after }}');
+      let remaining = seconds;
+      const el = document.getElementById('retryCountdown');
+      const interval = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) { clearInterval(interval); location.reload(); }
+        if (el) el.textContent = remaining;
+      }, 1000);
+    } catch(_) {}
+  })();
+</script>
+{% endblock %}

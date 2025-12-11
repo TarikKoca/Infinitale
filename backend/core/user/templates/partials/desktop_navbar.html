@@ -1,0 +1,67 @@
+{% load static %}
+{% load i18n %}
+<style>
+.glass {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-default);
+}
+.bg-card {
+  background: var(--bg-card);
+}
+.border-default {
+  border-color: var(--border-default);
+}
+.bg-card-hover:hover {
+  background: var(--bg-card-hover);
+}
+.border-strong:hover {
+  border-color: var(--border-strong);
+}
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.bg-subtle {
+  background: var(--border-subtle);
+}
+</style>
+<nav class="fixed top-0 w-full z-50 glass border-b border-slate-500/30" role="navigation" aria-label="Top navigation">
+  <div class=" mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center space-x-3">
+        <a href="{% url 'player_home' %}" class="flex items-center space-x-2">
+          <img id="navbar-logo" src="{% static 'images/logo_black.png' %}" alt="Eternalore" class="w-9 h-9" loading="lazy">
+        </a>
+      </div>
+      <div class="flex items-center space-x-3">
+        {% if prof %}
+        <!-- Usage Display -->
+        {% if audio_hours_limit %}
+        <div class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-card border border-default bg-card-hover transition-all">
+          <i class="fas fa-hourglass-half text-secondary"></i>
+          <div class="flex flex-col">
+            <div class="text-xs text-secondary font-medium">{{ audio_hours_used|floatformat:1 }}/{{ audio_hours_limit|floatformat:0 }}h</div>
+            <div class="w-24 bg-subtle rounded-full h-1.5 mt-1">
+              <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full transition-all duration-300" 
+                   style="width: min({{ audio_percentage|floatformat:0 }}%, 100%)"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <a href="{% url 'account_settings' %}" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all bg-card backdrop-blur-sm border border-default bg-card-hover border-strong">
+          <div class="text-sm font-medium text-primary">{{ prof.display_name }}</div>
+        </a>
+        {% endif %}
+        <a href="{% url 'logout' %}" class="px-3 py-1.5 rounded bg-red-600/80 hover:bg-red-600 text-white text-sm flex items-center gap-2 transition-colors">
+          <i class="fas fa-sign-out-alt"></i>
+          {% trans "Logout" %}
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+

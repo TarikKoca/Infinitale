@@ -1,0 +1,191 @@
+version: '3.8'
+
+services:
+  db-staging:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      POSTGRES_DB: ${DB_NAME:-Eternalore_staging}
+      POSTGRES_USER: ${DB_USER:-Eternalore_staging}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
+    volumes:
+      - db_data_staging:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-Eternalore_staging}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eternalore-staging-network
+
+  redis-staging:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data_staging:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eternalore-staging-network
+
+  web-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      DEBUG: "False"
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DB_HOST: db-staging
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis-staging:6379/0
+      CELERY_RESULT_BACKEND: redis://redis-staging:6379/1
+      REDIS_URL: redis://redis-staging:6379/2
+    depends_on:
+      db-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend/core/var/media:/app/backend/core/var/media
+      - ./backend/core/var/logs:/app/backend/core/var/logs
+      - static_volume_staging:/app/backend/core/var/staticfiles
+    command: >
+      bash -c "
+        cd backend/core &&
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput &&
+        gunicorn core.asgi:application \
+          --bind 0.0.0.0:8000 \
+          --workers 2 \
+          --worker-class uvicorn.workers.UvicornWorker \
+          --worker-tmp-dir /dev/shm \
+          --timeout 120 \
+          --keep-alive 5 \
+          --max-requests 500 \
+          --max-requests-jitter 50 \
+          --access-logfile - \
+          --error-logfile - \
+          --log-level info
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - eternalore-staging-network
+
+  worker-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      DEBUG: "False"
+      DB_HOST: db-staging
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis-staging:6379/0
+      CELERY_RESULT_BACKEND: redis://redis-staging:6379/1
+    depends_on:
+      db-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    volumes:
+      - ./backend/core/var/media:/app/backend/core/var/media
+      - ./backend/core/var/logs:/app/backend/core/var/logs
+    command: >
+      bash -c "
+        cd backend/core &&
+        celery -A core worker \
+          -l info \
+          --concurrency=2 \
+          --max-tasks-per-child=100 \
+          --time-limit=300 \
+          --soft-time-limit=240
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A core inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - eternalore-staging-network
+
+  beat-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      DEBUG: "False"
+      DB_HOST: db-staging
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis-staging:6379/0
+      CELERY_RESULT_BACKEND: redis://redis-staging:6379/1
+    depends_on:
+      db-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    volumes:
+      - ./backend/core/var/logs:/app/backend/core/var/logs
+    command: >
+      bash -c "
+        cd backend/core &&
+        celery -A core beat -l info
+      "
+    networks:
+      - eternalore-staging-network
+
+  nginx-staging:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites/staging.conf:/etc/nginx/sites-enabled/staging.conf:ro
+      - static_volume_staging:/static:ro
+      - ./backend/core/var/media:/media:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - web-staging
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - eternalore-staging-network
+
+volumes:
+  db_data_staging:
+  redis_data_staging:
+  static_volume_staging:
+
+networks:
+  eternalore-staging-network:
+    driver: bridge
+
+

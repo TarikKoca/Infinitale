@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} - Eternalore Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            color: var(--text-primary);
+            font-size: 28px;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        
+        .status-healthy { background: var(--color-success-600); color: var(--text-inverse); }
+        .status-warning { background: var(--color-warning-600); color: var(--text-inverse); }
+        .status-critical { background: var(--color-error-600); color: var(--text-inverse); }
+        .status-down { background: var(--text-muted); color: var(--text-inverse); }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-default);
+        }
+        
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label { color: var(--text-secondary); }
+        
+        .metric-value { font-weight: 600; color: var(--text-primary); }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-hover);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--color-success-600);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-fill.warning { background: var(--color-warning-600); }
+        .progress-fill.critical { background: var(--color-error-600); }
+        
+        .test-runner {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .test-item {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-name {
+            font-weight: 500;
+        }
+        
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+        
+        .test-indicator.success { background: var(--color-success-600); }
+        .test-indicator.failed { background: var(--color-error-600); }
+        .test-indicator.running { 
+            background: var(--color-primary-600);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        button {
+            background: var(--color-primary-600);
+            color: var(--text-inverse);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: var(--color-primary-700);
+        }
+        
+        button:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+        
+        .log-viewer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .log-line {
+            padding: 2px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .log-line.error { color: var(--color-error-600); }
+        .log-line.warning { color: var(--color-warning-600); }
+        .log-line.info { color: var(--color-primary-600); }
+        
+        .charts {
+            margin-top: 30px;
+        }
+        
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .error-chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .error-bar {
+            flex: 1;
+            background: var(--color-error-600);
+            border-radius: 4px 4px 0 0;
+            min-height: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .error-bar:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tab-container {
+            margin-top: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-default);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--color-primary-600);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .alert {
+            background: var(--color-warning-50);
+            color: var(--color-warning-700);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert.error {
+            background: var(--color-error-50);
+            color: var(--color-error-700);
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-light);
+            border-top: 2px solid var(--color-primary-600);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ page_title }}</h1>
+            <div class="status-badge" id="overall-status">Loading...</div>
+        </header>
+
+        <!-- System Metrics -->
+        <div class="grid">
+            <div class="card">
+                <h2>System Resources</h2>
+                <div id="system-metrics">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Database</h2>
+                <div id="database-metrics">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Redis</h2>
+                <div id="redis-metrics">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Celery Workers</h2>
+                <div id="celery-metrics">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Metrics -->
+        <div class="card">
+            <h2>Game Activity</h2>
+            <div id="game-metrics">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Test Runner -->
+        <div class="test-runner">
+            <h2>Service Tests</h2>
+            <div class="actions">
+                <button onclick="runAllTests()" id="run-all-tests">Run All Tests</button>
+                <button onclick="clearCache()">Clear Cache</button>
+                <button onclick="refreshMetrics()">Refresh Metrics</button>
+            </div>
+            <div class="test-grid" id="test-results">
+                <!-- Test results will be populated here -->
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('errors')">Error Analysis</button>
+                <button class="tab" onclick="switchTab('logs')">Live Logs</button>
+                <button class="tab" onclick="switchTab('apis')">External APIs</button>
+            </div>
+            
+            <div class="tab-content active" id="errors-tab">
+                <div class="chart-container">
+                    <h3>Error Rate (Last 24 Hours)</h3>
+                    <div id="error-chart" class="error-chart">
+                        <!-- Error chart will be populated here -->
+                    </div>
+                    <div id="error-summary" style="margin-top: 20px;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="logs-tab">
+                <div class="card">
+                    <h3>Recent Logs</h3>
+                    <div class="actions">
+                        <button onclick="loadLogs('main')">Main Log</button>
+                        <button onclick="loadLogs('error')">Error Log</button>
+                    </div>
+                    <div class="log-viewer" id="log-viewer">
+                        <div class="log-line">Click a button above to load logs...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="apis-tab">
+                <div class="grid" id="api-status">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let autoRefreshInterval = null;
+        let testRunning = false;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshMetrics();
+            loadErrorMetrics();
+            startAutoRefresh();
+        });
+
+        // Auto refresh every 30 seconds
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(refreshMetrics, 30000);
+        }
+
+        // Refresh all metrics
+        async function refreshMetrics() {
+            try {
+                const response = await fetch('/admin/api/health/');
+                const data = await response.json();
+                
+                updateOverallStatus(data.status);
+                updateSystemMetrics(data.components.system);
+                updateDatabaseMetrics(data.components.database);
+                updateRedisMetrics(data.components.redis);
+                updateCeleryMetrics(data.components.celery);
+                updateAPIStatus(data.components.apis);
+                
+                // Load game metrics
+                loadGameMetrics();
+            } catch (error) {
+                console.error('Failed to refresh metrics:', error);
+                showAlert('Failed to refresh metrics', 'error');
+            }
+        }
+
+        // Update overall status badge
+        function updateOverallStatus(status) {
+            const badge = document.getElementById('overall-status');
+            badge.className = `status-badge status-${status}`;
+            badge.textContent = status.toUpperCase();
+        }
+
+        // Update system metrics
+        function updateSystemMetrics(metrics) {
+            const container = document.getElementById('system-metrics');
+            if (!metrics || Object.keys(metrics).length === 0) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="metric">
+                    <span class="metric-label">CPU Usage</span>
+                    <span class="metric-value">${metrics.cpu.percent}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${metrics.cpu.status}" style="width: ${metrics.cpu.percent}%"></div>
+                </div>
+                
+                <div class="metric">
+                    <span class="metric-label">Memory</span>
+                    <span class="metric-value">${metrics.memory.used_gb}GB / ${metrics.memory.total_gb}GB</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${metrics.memory.status}" style="width: ${metrics.memory.percent}%"></div>
+                </div>
+                
+                <div class="metric">
+                    <span class="metric-label">Disk</span>
+                    <span class="metric-value">${metrics.disk.used_gb}GB / ${metrics.disk.total_gb}GB</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${metrics.disk.status}" style="width: ${metrics.disk.percent}%"></div>
+                </div>
+            `;
+        }
+
+        // Update database metrics
+        function updateDatabaseMetrics(metrics) {
+            const container = document.getElementById('database-metrics');
+            if (!metrics) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            const statusBadge = `<span class="status-badge status-${metrics.status}">${metrics.status}</span>`;
+            
+            container.innerHTML = `
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    ${statusBadge}
+                </div>
+                ${metrics.response_time_ms ? `
+                <div class="metric">
+                    <span class="metric-label">Response Time</span>
+                    <span class="metric-value">${metrics.response_time_ms}ms</span>
+                </div>
+                ` : ''}
+                ${metrics.error ? `
+                <div class="metric">
+                    <span class="metric-label">Error</span>
+                    <span class="metric-value" style="color: #ef4444;">${metrics.error}</span>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        // Update Redis metrics
+        function updateRedisMetrics(metrics) {
+            const container = document.getElementById('redis-metrics');
+            if (!metrics) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            const statusBadge = `<span class="status-badge status-${metrics.status}">${metrics.status}</span>`;
+            
+            container.innerHTML = `
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    ${statusBadge}
+                </div>
+                ${metrics.response_time_ms ? `
+                <div class="metric">
+                    <span class="metric-label">Response Time</span>
+                    <span class="metric-value">${metrics.response_time_ms}ms</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Connected Clients</span>
+                    <span class="metric-value">${metrics.connected_clients}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Memory Usage</span>
+                    <span class="metric-value">${metrics.used_memory_mb}MB</span>
+                </div>
+                ` : ''}
+                ${metrics.error ? `
+                <div class="metric">
+                    <span class="metric-label">Error</span>
+                    <span class="metric-value" style="color: #ef4444;">${metrics.error}</span>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        // Update Celery metrics
+        function updateCeleryMetrics(metrics) {
+            const container = document.getElementById('celery-metrics');
+            if (!metrics) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            const statusBadge = `<span class="status-badge status-${metrics.status}">${metrics.status}</span>`;
+            
+            container.innerHTML = `
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    ${statusBadge}
+                </div>
+                ${metrics.workers !== undefined ? `
+                <div class="metric">
+                    <span class="metric-label">Workers</span>
+                    <span class="metric-value">${metrics.workers}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Tasks</span>
+                    <span class="metric-value">${metrics.active_tasks || 0}</span>
+                </div>
+                ` : ''}
+                ${metrics.error ? `
+                <div class="metric">
+                    <span class="metric-label">Error</span>
+                    <span class="metric-value" style="color: #ef4444;">${metrics.error}</span>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        // Update API status
+        function updateAPIStatus(apis) {
+            const container = document.getElementById('api-status');
+            if (!apis) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            let html = '';
+            for (const [name, data] of Object.entries(apis)) {
+                const statusBadge = `<span class="status-badge status-${data.status}">${data.status}</span>`;
+                html += `
+                    <div class="card">
+                        <h3>${name.toUpperCase()}</h3>
+                        <div class="metric">
+                            <span class="metric-label">Status</span>
+                            ${statusBadge}
+                        </div>
+                        ${data.response_time_ms ? `
+                        <div class="metric">
+                            <span class="metric-label">Response Time</span>
+                            <span class="metric-value">${data.response_time_ms}ms</span>
+                        </div>
+                        ` : ''}
+                        ${data.error ? `
+                        <div class="metric">
+                            <span class="metric-label">Error</span>
+                            <span class="metric-value" style="color: #ef4444;">${data.error}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // Load game metrics
+        async function loadGameMetrics() {
+            try {
+                const response = await fetch('/admin/api/game-metrics/');
+                const metrics = await response.json();
+                
+                const container = document.getElementById('game-metrics');
+                container.innerHTML = `
+                    <div class="grid">
+                        <div class="metric">
+                            <span class="metric-label">Active Games</span>
+                            <span class="metric-value">${metrics.active_games || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Games Created (1h)</span>
+                            <span class="metric-value">${metrics.games_created_1h || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Games Created (24h)</span>
+                            <span class="metric-value">${metrics.games_created_24h || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Turns Processed (1h)</span>
+                            <span class="metric-value">${metrics.turns_processed_1h || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Turns Processed (24h)</span>
+                            <span class="metric-value">${metrics.turns_processed_24h || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Active Users (24h)</span>
+                            <span class="metric-value">${metrics.active_users_24h || 0}</span>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load game metrics:', error);
+            }
+        }
+
+        // Load error metrics
+        async function loadErrorMetrics() {
+            try {
+                const response = await fetch('/admin/api/error-metrics/?hours=24');
+                const metrics = await response.json();
+                
+                // Update error chart
+                const chartContainer = document.getElementById('error-chart');
+                const errorsByHour = metrics.errors_by_hour || {};
+                
+                if (Object.keys(errorsByHour).length > 0) {
+                    const maxErrors = Math.max(...Object.values(errorsByHour));
+                    chartContainer.innerHTML = Object.entries(errorsByHour)
+                        .map(([hour, count]) => {
+                            const height = (count / maxErrors) * 100;
+                            const hourLabel = new Date(hour).getHours() + ':00';
+                            return `<div class="error-bar" style="height: ${height}%" data-tooltip="${hourLabel}: ${count} errors"></div>`;
+                        })
+                        .join('');
+                } else {
+                    chartContainer.innerHTML = '<p style="text-align: center; color: #9ca3af;">No errors in the last 24 hours</p>';
+                }
+                
+                // Update error summary
+                const summaryContainer = document.getElementById('error-summary');
+                summaryContainer.innerHTML = `
+                    <div class="grid">
+                        <div class="metric">
+                            <span class="metric-label">Total Errors (24h)</span>
+                            <span class="metric-value">${metrics.total_errors || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Error Rate</span>
+                            <span class="metric-value">${metrics.error_rate || 0}%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Failed Turns</span>
+                            <span class="metric-value">${metrics.failed_turns || 0}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Successful Turns</span>
+                            <span class="metric-value">${metrics.successful_turns || 0}</span>
+                        </div>
+                    </div>
+                    ${metrics.errors_by_type ? `
+                    <h4 style="margin-top: 20px;">Errors by Type</h4>
+                    <div class="grid">
+                        ${Object.entries(metrics.errors_by_type).map(([type, count]) => `
+                            <div class="metric">
+                                <span class="metric-label">${type.replace(/_/g, ' ').toUpperCase()}</span>
+                                <span class="metric-value">${count}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                `;
+            } catch (error) {
+                console.error('Failed to load error metrics:', error);
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            if (testRunning) return;
+            
+            testRunning = true;
+            const button = document.getElementById('run-all-tests');
+            button.disabled = true;
+            button.textContent = 'Running Tests...';
+            
+            const container = document.getElementById('test-results');
+            
+            // Initialize test UI
+            const tests = [
+                'database', 'redis', 'celery', 'openai_api', 'replicate_api',
+                'user_creation', 'game_creation', 'turn_processing', 'media_storage'
+            ];
+            
+            container.innerHTML = tests.map(test => `
+                <div class="test-item" id="test-${test}">
+                    <span class="test-name">${test.replace(/_/g, ' ').toUpperCase()}</span>
+                    <div class="test-status">
+                        <div class="test-indicator running"></div>
+                        <span class="test-duration">Running...</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            try {
+                const response = await fetch('/admin/api/run-all-tests/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Update test results
+                for (const [testName, result] of Object.entries(data.results)) {
+                    const testElement = document.getElementById(`test-${testName}`);
+                    if (testElement) {
+                        const indicator = testElement.querySelector('.test-indicator');
+                        const duration = testElement.querySelector('.test-duration');
+                        
+                        indicator.className = `test-indicator ${result.success ? 'success' : 'failed'}`;
+                        duration.textContent = `${result.duration}ms`;
+                        
+                        if (!result.success) {
+                            testElement.title = result.message;
+                        }
+                    }
+                }
+                
+                // Show summary
+                showAlert(`Tests completed: ${data.summary.passed} passed, ${data.summary.failed} failed`, 
+                         data.summary.failed > 0 ? 'error' : 'success');
+                
+            } catch (error) {
+                console.error('Failed to run tests:', error);
+                showAlert('Failed to run tests', 'error');
+            } finally {
+                testRunning = false;
+                button.disabled = false;
+                button.textContent = 'Run All Tests';
+            }
+        }
+
+        // Run single test
+        async function runTest(testName) {
+            const testElement = document.getElementById(`test-${testName}`);
+            const indicator = testElement.querySelector('.test-indicator');
+            const duration = testElement.querySelector('.test-duration');
+            
+            indicator.className = 'test-indicator running';
+            duration.textContent = 'Running...';
+            
+            try {
+                const response = await fetch('/admin/api/run-test/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ test_name: testName })
+                });
+                
+                const result = await response.json();
+                
+                indicator.className = `test-indicator ${result.success ? 'success' : 'failed'}`;
+                duration.textContent = `${result.duration_ms}ms`;
+                
+                if (!result.success) {
+                    testElement.title = result.message;
+                }
+            } catch (error) {
+                console.error(`Failed to run test ${testName}:`, error);
+                indicator.className = 'test-indicator failed';
+                duration.textContent = 'Error';
+            }
+        }
+
+        // Clear cache
+        async function clearCache() {
+            const confirmed = await (window.showConfirm ? window.showConfirm({
+                title: 'Clear cache now?',
+                message: 'This will purge application caches immediately.',
+                confirmText: 'Clear cache',
+                cancelText: 'Cancel',
+                variant: 'danger'
+            }) : Promise.resolve(confirm('Are you sure you want to clear the cache?')));
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch('/admin/api/clear-cache/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                const result = await response.json();
+                showAlert(result.message, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    refreshMetrics();
+                }
+            } catch (error) {
+                console.error('Failed to clear cache:', error);
+                showAlert('Failed to clear cache', 'error');
+            }
+        }
+
+        // Load logs
+        async function loadLogs(logType) {
+            const viewer = document.getElementById('log-viewer');
+            viewer.innerHTML = '<div class="spinner"></div>';
+            
+            try {
+                const response = await fetch(`/admin/api/log-tail/?type=${logType}&lines=100`);
+                const data = await response.json();
+                
+                if (data.logs && data.logs.length > 0) {
+                    viewer.innerHTML = data.logs.map(line => {
+                        let className = 'log-line';
+                        if (line.includes('ERROR')) className += ' error';
+                        else if (line.includes('WARNING')) className += ' warning';
+                        else if (line.includes('INFO')) className += ' info';
+                        
+                        return `<div class="${className}">${escapeHtml(line)}</div>`;
+                    }).join('');
+                } else {
+                    viewer.innerHTML = '<div class="log-line">No log entries found</div>';
+                }
+                
+                // Scroll to bottom
+                viewer.scrollTop = viewer.scrollHeight;
+            } catch (error) {
+                console.error('Failed to load logs:', error);
+                viewer.innerHTML = '<div class="log-line error">Failed to load logs</div>';
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load content if needed
+            if (tabName === 'logs' && !document.getElementById('log-viewer').children.length) {
+                loadLogs('main');
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            
+            document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Get CSRF cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>

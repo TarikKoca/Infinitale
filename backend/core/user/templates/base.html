@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+{% load i18n %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Eternalore{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+  <link rel="stylesheet" href="{% static 'src/output.css' %}">
+  <link rel="stylesheet" href="{% static 'src/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="var(--bg-primary)">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="var(--bg-primary)">
+  {% if SITE_URL %}
+  <link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
+  {% endif %}
+  {# hreflang alternates #}
+  {% if SITE_URL %}
+  <link rel="alternate" href="{{ SITE_URL }}{{ request.get_full_path }}" hreflang="x-default">
+  <link rel="alternate" href="{{ SITE_URL }}/en{{ request.get_full_path }}" hreflang="en">
+  <link rel="alternate" href="{{ SITE_URL }}/es{{ request.get_full_path }}" hreflang="es">
+  <link rel="alternate" href="{{ SITE_URL }}/fr{{ request.get_full_path }}" hreflang="fr">
+  <link rel="alternate" href="{{ SITE_URL }}/pt-br{{ request.get_full_path }}" hreflang="pt-BR">
+  {% endif %}
+  {% if GA_MEASUREMENT_ID and not DEBUG %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ GA_MEASUREMENT_ID }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '{{ GA_MEASUREMENT_ID }}');
+  </script>
+  {% endif %}
+  {% block head %}{% endblock %}
+  <script>
+    // Apply theme before page render to prevent flash
+    (function() {
+      try {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const stored = localStorage.getItem('theme') || 'system';
+        const resolved = stored === 'system' ? (prefersDark ? 'dark' : 'light') : stored;
+        document.documentElement.setAttribute('data-theme', resolved);
+        // Store for later usage by logo update
+        window.initialTheme = resolved;
+        window.initialThemeMode = stored; // 'system' | 'light' | 'dark'
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'light');
+        window.initialTheme = 'light';
+        window.initialThemeMode = 'light';
+      }
+    })();
+  </script>
+</head>
+<body{% if user.is_authenticated %} data-user-id="{{ user.id }}"{% endif %}>
+  <script>
+    // Apply theme to body immediately
+    (function() {
+      try {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const stored = localStorage.getItem('theme') || 'system';
+        const resolved = stored === 'system' ? (prefersDark ? 'dark' : 'light') : stored;
+        document.body.setAttribute('data-theme', resolved);
+      } catch (_) {
+        document.body.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <div id="toastRoot" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <div id="networkStatus" class="network-status hidden" role="status" aria-live="polite"></div>
+  {% block content %}{% endblock %}
+  {% if SHOW_PRICING_CTA %}
+  <div id="pricingCtaModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60">
+    <div class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-2xl shadow-2xl max-w-md w-[92vw] p-6 border border-slate-200/70 dark:border-slate-700/60">
+      <div class="flex items-start justify-between">
+        <h3 class="text-2xl font-bold">{% trans "You’ve reached the Free plan limit" %}</h3>
+        <button class="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300" aria-label="{% trans "Close" %}" onclick="document.getElementById('pricingCtaModal').remove()"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <p class="mt-3 text-slate-600 dark:text-slate-300">{% trans "Upgrade to keep playing with more hours, visuals, and features." %}</p>
+      <div class="mt-5 flex gap-3">
+        <a href="{% url 'pricing' %}" class="px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-600">{% trans "See Plans" %}</a>
+        <button class="px-4 py-2 rounded-lg border font-semibold border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="document.getElementById('pricingCtaModal').remove()">{% trans "Not now" %}</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <script src="{% static 'src/api.js' %}"></script>
+  <script>
+    window.I18N_NETWORK = {
+      backOnline: '{{ _("Back online")|escapejs }}',
+      offline: '{{ _("You are offline")|escapejs }}',
+      reconnecting: '{{ _("Reconnecting…")|escapejs }}'
+    };
+    window.I18N_UI = {
+      areYouSure: '{{ _("Are you sure?")|escapejs }}',
+      confirm: '{{ _("Confirm")|escapejs }}',
+      cancel: '{{ _("Cancel")|escapejs }}',
+      notification: '{{ _("Notification")|escapejs }}',
+      okay: '{{ _("Okay")|escapejs }}',
+      close: '{{ _("Close")|escapejs }}',
+      errorTitle: '{{ _("Error")|escapejs }}',
+      warningTitle: '{{ _("Warning")|escapejs }}',
+      rateLimitTitle: '{{ _("Rate Limit Exceeded")|escapejs }}',
+      rateLimitPrefix: "{{ _("You've made too many requests. Please wait")|escapejs }}",
+      rateLimitSuffix: "{{ _("seconds before trying again.")|escapejs }}"
+    };
+  </script>
+  <script src="{% static 'src/scripts.js' %}"></script>
+  <script>
+    // Theme switching functionality
+    function updateLogo(theme) {
+      const navbarLogo = document.getElementById('navbar-logo');
+      const landingLogos = document.querySelectorAll('.landing-logo');
+      
+      if (navbarLogo) {
+        if (theme === 'light') {
+          navbarLogo.src = '{% static "images/logo_black.png" %}';
+        } else {
+          navbarLogo.src = '{% static "images/logo.png" %}';
+        }
+      }
+      
+      landingLogos.forEach(logo => {
+        if (theme === 'light') {
+          logo.src = '{% static "images/logo_black.png" %}';
+        } else {
+          logo.src = '{% static "images/logo.png" %}';
+        }
+      });
+    }
+    
+    (function(){
+      let systemMediaQuery;
+      function resolveTheme(mode) {
+        if (mode === 'system') {
+          try {
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+          } catch (_) { return 'light'; }
+        }
+        return mode;
+      }
+      function applyTheme(mode) {
+        const theme = resolveTheme(mode);
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+        updateLogo(theme);
+      }
+      function observeSystemTheme(enable) {
+        try {
+          if (!window.matchMedia) return;
+          if (!systemMediaQuery) systemMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          if (enable) {
+            systemMediaQuery.addEventListener('change', onSystemChange);
+          } else {
+            systemMediaQuery.removeEventListener('change', onSystemChange);
+          }
+        } catch (_) {}
+      }
+      function onSystemChange() {
+        const mode = localStorage.getItem('theme') || 'system';
+        if (mode === 'system') applyTheme('system');
+      }
+      window.setTheme = function(mode) {
+        const normalized = (mode === 'system' || mode === 'light' || mode === 'dark') ? mode : 'system';
+        localStorage.setItem('theme', normalized);
+        applyTheme(normalized);
+        observeSystemTheme(normalized === 'system');
+        if (window.userId) {
+          fetch('{% url "api_set_theme" %}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify({ theme: normalized })
+          });
+        }
+      };
+      // Initialize observer if user prefers system
+      observeSystemTheme((localStorage.getItem('theme') || 'system') === 'system');
+      // Expose helper for settings page
+      window.resolveTheme = resolveTheme;
+    })();
+    
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    
+    // Make setTheme available globally
+    window.setTheme = setTheme;
+    
+    // Set userId from body data attribute if present
+    (function(){
+      try {
+        var uid = document.body.getAttribute('data-user-id');
+        if (uid) { window.userId = uid; }
+      } catch(_) {}
+    })();
+    
+    // Apply saved theme on load
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = window.initialTheme || 'light';
+      updateLogo(savedTheme);
+    });
+  </script>
+</body>
+</html>
+
+

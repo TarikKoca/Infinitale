@@ -1,0 +1,1496 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}In Game - Eternalore{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="{% static 'player-home/styles.css' %}">
+{% endblock %}
+{% block content %}
+<div class="ig-root ig-bg min-h-screen overflow-hidden">
+  <!-- HUD / Top Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 ig-glass shadow-lg">
+    <div class="flex items-center justify-between h-16 px-3 sm:px-4 md:px-6">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="{% url 'player_home' %}" class="ig-hud-btn p-2 rounded-lg transition-colors focus-ring" aria-label="{% trans 'Back' %}">
+          <i class="fas fa-arrow-left text-sm"></i>
+        </a>
+        <h1 class="text-xs sm:text-sm md:text-base font-black opacity-90 truncate max-w-[50vw] text-primary">{{ game.genre_name|title }} • {{ game.main_character_name }}</h1>
+        <div class="hidden md:flex items-center gap-2 text-[11px] text-muted ml-2">
+          <span class="ig-kbd" title="{% trans 'Back / Home' %}">Esc</span>
+          <span></span>
+          <span class="ig-kbd" title="{% trans 'Prev' %}">↑</span>
+          <span>{% trans 'previous' %} </span>
+          <span class="ig-kbd" title="{% trans 'Next' %}">↓</span>
+          <span>{% trans 'next' %} </span>
+          {% if prof.subscription_plan != 'free' %}
+          <span class="ig-kbd" title="{% trans 'Play/Stop' %}">Space</span>
+          <span>{% trans 'play/stop' %} </span>
+          {% endif %}
+          <span class="ig-kbd" title="{% trans 'Submit' %}">Enter</span>
+          <span>{% trans 'submit' %}</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 ig-game-toolbar">
+        {% if prof.subscription_plan != 'free' %}
+        <div class="modern-audio-control" aria-label="{% trans 'SFX volume' %}">
+          <div class="audio-control-icon">
+            <i class="fas fa-volume-up text-sm"></i>
+          </div>
+          <div class="audio-control-content">
+            <span class="audio-control-label">{% trans 'SFX' %}</span>
+            <input type="range" min="0" max="100" value="65" class="modern-slider" />
+          </div>
+        </div>
+        <div class="modern-audio-control" aria-label="{% trans 'Voice volume' %}">
+          <div class="audio-control-icon">
+            <i class="fas fa-microphone text-sm"></i>
+          </div>
+          <div class="audio-control-content">
+            <span class="audio-control-label">{% trans 'Voice' %}</span>
+            <input type="range" min="0" max="100" value="100" class="modern-slider" />
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Interface -->
+  <main class="flex flex-col h-screen pt-16 ig-layout">
+    <section class="flex-1 p-0 md:p-4">
+      <div class="ig-glass rounded-xl h-[calc(100vh-6rem)] overflow-hidden relative ig-visual-card">
+        <div id="gameImageContainer" class="relative w-full h-full ig-image-placeholder">
+          <img id="currentGameImage" src="" alt="Game Scene" class="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0" loading="eager">
+          <div id="introGradient" class="ig-intro-gradient absolute inset-0 w-full h-full"></div>
+          
+          <!-- Scene Text Overlay - Top Center of Image -->
+          <div id="sceneTextOverlay" class="absolute top-4 left-0 right-0 z-30 flex justify-center px-4">
+            <div class="scene-overlay-card">
+              <div id="overlayLineText" class="scene-overlay-content">
+                {% if last_turn %}
+                  {% if last_turn.user_text %}
+                    <span class="user-choice-text">&gt; {{ last_turn.user_text }}</span><br>
+                  {% endif %}
+                  <span class="scene-text">{{ last_turn.new_lines }}</span>
+                {% elif not turns %}
+                  {% if has_pending_turns %}
+                    <span class="scene-text">{% trans 'Loading story...' %}</span>
+                  {% else %}
+                    <span class="scene-text">{% trans 'No content available' %}</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+              
+              <!-- Status indicators in overlay -->
+              <div id="overlayGenStatus" class="hidden mt-2 text-sm text-blue-400 flex items-center gap-2">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>{% trans 'Generating...' %}</span>
+                {% if prof.subscription_plan == 'free' %}
+                <a id="overlayGenCta" href="{% url 'pricing' %}" class="hidden text-xs text-amber-300 underline hover:opacity-80 whitespace-nowrap">
+                  {% trans "Faster responses? Upgrade" %}
+                </a>
+                {% endif %}
+              </div>
+              <div id="overlayGenError" class="hidden mt-2 text-sm text-red-400"></div>
+              <div id="timeoutRetry" class="hidden mt-2 text-sm text-yellow-300 flex items-center gap-2">
+                <span>{% trans 'Taking too long. You can retry now.' %}</span>
+                <button id="retryNowBtn" class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 rounded text-xs font-medium transition">{% trans 'Retry' %}</button>
+              </div>
+            </div>
+          </div>
+          
+          <div id="sceneLoader" class="absolute inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center">
+            <div class="ig-glass px-5 py-2.5 rounded-lg text-sm"><i class="fas fa-spinner fa-spin mr-2"></i>{% trans 'Loading scene…' %}</div>
+          </div>
+
+          <!-- Hidden audio elements available globally -->
+          {% if last_turn and last_turn.generated_tts_url %}
+            <audio id="ttsAudio" src="{{ last_turn.generated_tts_url }}" class="hidden"></audio>
+          {% else %}
+            <audio id="ttsAudio" class="hidden"></audio>
+          {% endif %}
+          <audio id="sfxAudio" class="hidden"></audio>
+
+          <!-- Choices overlay placeholder (kept for backward compatibility but hidden) -->
+          <div id="choicesOverlay" class="hidden"></div>
+
+          <!-- Single-line panel (bottom center) -->
+          <div id="linePanel" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,900px)]">
+            <div class="rounded-xl p-3 md:p-4">
+              <!-- Story text moved to overlay - keep this for backward compatibility and navigation -->
+              <div class="mb-3" style="display: none;">
+                <div id="currentLineText" class="text-sm md:text-base leading-relaxed">
+                  {% if last_turn %}
+                    {% if last_turn.user_text %}
+                      <span class="text-xs font-semibold text-blue-400 italic">&gt; {{ last_turn.user_text }}</span><br>
+                    {% endif %}
+                    {{ last_turn.new_lines }}
+                  {% elif not turns %}
+                    {% if has_pending_turns %}Loading story...{% else %}No content available{% endif %}
+                  {% endif %}
+                </div>
+                <div id="genStatus" class="hidden mt-2 text-sm text-blue-400 flex items-center gap-2">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Generating...</span>
+                  {% if prof.subscription_plan == 'free' %}
+                  <a id="genCta" href="{% url 'pricing' %}" class="hidden text-xs text-amber-500 underline hover:opacity-80 whitespace-nowrap">
+                    {% trans "Get faster turns" %}
+                  </a>
+                  {% endif %}
+                </div>
+                <div id="genError" class="hidden mt-2 text-sm text-red-400"></div>
+                
+                <!-- Critical Error Status -->
+                <div id="criticalErrorStatus" class="hidden mt-3 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                    <span class="text-sm font-semibold text-red-200">{% trans 'System Issue Detected' %}</span>
+                  </div>
+                  <p class="text-xs text-red-300 mb-2">{% trans "We're experiencing technical difficulties and are working to resolve them. Your game progress is saved." %}</p>
+                  <div class="flex gap-2">
+                    <button id="retryAfterError" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded text-xs font-medium transition">
+                      <i class="fas fa-sync-alt mr-1"></i>{% trans 'Try Again' %}
+                    </button>
+                    <button onclick="location.reload()" class="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded text-xs font-medium transition">
+                      <i class="fas fa-refresh mr-1"></i>{% trans 'Refresh' %}
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Retry Status -->
+                <div id="retryStatus" class="hidden mt-3 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded-lg">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-clock text-yellow-400"></i>
+                    <span class="text-sm font-semibold text-yellow-200">{% trans 'Retrying...' %}</span>
+                  </div>
+                  <p class="text-xs text-yellow-300">{% trans 'We encountered an issue and are trying again. Please wait a moment.' %}</p>
+                  <div class="mt-2 bg-yellow-900/20 rounded-full h-1.5">
+                    <div id="retryProgressBar" class="bg-yellow-400 h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Choices above input field -->
+              <div id="choicesContainer" class="mb-3">{% if last_turn and last_turn.choices %}<div class="flex flex-wrap gap-2 justify-center">{% for c in last_turn.choices %}<button type="button" data-choice="{{ c }}" class="choiceBtn px-4 py-2 rounded-lg text-sm font-semibold transition-all focus:outline-none"><span class="truncate">{{ c }}</span></button>{% endfor %}</div>{% endif %}</div>
+              
+              <!-- Input row with navigation, text input, and play button -->
+              <div class="flex items-center gap-2">
+                <!-- Up/down navigation buttons on the left -->
+                <div class="flex flex-col gap-1">
+                  <button id="prevLineBtn" class="px-2 py-1 rounded bg-card border border-default text-primary text-sm focus:outline-none" {% if not turns %}disabled{% endif %}><i class="fas fa-chevron-up"></i></button>
+                  <button id="nextLineBtn" class="px-2 py-1 rounded bg-card border border-default text-primary text-sm focus:outline-none" {% if not turns %}disabled{% endif %}><i class="fas fa-chevron-down"></i></button>
+                </div>
+                
+                <!-- Text input field -->
+                <form id="userForm" class="flex-1 flex gap-2">
+                  {% csrf_token %}
+                  <input type="text" id="userText" name="user_text" placeholder="{% trans 'Type your action...' %}" class="flex-1 px-3 py-2 rounded-lg transition form-input" autocomplete="off">
+                </form>
+                
+                <!-- Square play/stop button -->
+                {% if prof.subscription_plan != 'free' %}
+                <button id="playToggle" class="w-12 h-12 rounded-lg flex items-center justify-center focus:outline-none bg-card text-primary border border-default" title="{% trans 'Play/Stop Audio' %}">
+                  <i class="fas fa-play text-lg"></i>
+                </button>
+                {% endif %}
+              </div>
+              
+            </div>
+          </div>
+
+          <!-- Hidden container to store all lines for navigation -->
+          <div class="hidden" aria-hidden="true">
+            <div id="storyScroll"><div id="storyLines" class="space-y-3">
+              {% for t in turns %}
+                <div class="ig-story-line p-3 bg-white/5 rounded-lg border border-white/10 {% if forloop.last %}ig-last-focus{% endif %}"
+                     {% if forloop.last %}id="lastTurn"{% endif %}
+                     data-image="{{ t.generated_visual_url }}"
+                     data-audio="{{ t.generated_tts_url }}"
+                     data-sfx="{{ t.selected_sound_effect }}"
+                     data-user-input="{{ t.user_text|default:'' }}"
+                     {% if t.choices %}data-choices="{{ t.choices|join:'||' }}"{% endif %}
+                     data-completed="{% if t.completed_at %}{{ t.completed_at|date:'c' }}{% endif %}"
+                     data-audio-dur="{{ t.audio_duration_seconds }}">
+                  {% if t.user_text %}
+                    <p class="text-xs font-semibold text-blue-400 mb-2 italic">&gt; {{ t.user_text }}</p>
+                  {% endif %}
+                  <p class="text-sm leading-relaxed">{{ t.new_lines }}</p>
+                </div>
+              {% endfor %}
+            </div></div>
+          </div>
+          
+          {% if not turns and has_pending_turns %}
+          <!-- Loading message when game is still being generated -->
+          <div id="loadingMessage" class="absolute inset-0 flex items-center justify-center">
+            <div class="ig-glass px-8 py-6 rounded-xl text-center max-w-md">
+              <div class="mb-4">
+                <i class="fas fa-spinner fa-spin text-4xl text-blue-400"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-2">Creating Your Adventure...</h3>
+              <p class="text-sm text-gray-300 mb-4">The world is being generated. This usually takes 10-30 seconds.</p>
+              <button onclick="location.reload()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
+                <i class="fas fa-sync-alt mr-2"></i>Refresh Page
+              </button>
+            </div>
+          </div>
+          {% elif not turns %}
+          <!-- Error message when no turns and no pending -->
+          <div id="errorMessage" class="absolute inset-0 flex items-center justify-center">
+            <div class="ig-glass px-8 py-6 rounded-xl text-center max-w-md">
+              <div class="mb-4">
+                <i class="fas fa-exclamation-triangle text-4xl text-yellow-400"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-2">Game Not Ready</h3>
+              <p class="text-sm text-gray-300 mb-4">There was an issue loading your game. Please try refreshing or return to your games.</p>
+              <div class="flex gap-3 justify-center">
+                <button onclick="location.reload()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
+                  <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+                <a href="{% url 'all_games' %}" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition">
+                  <i class="fas fa-arrow-left mr-2"></i>Back to Games
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+  
+
+  <script>
+    // Global function to update play button state
+    const USER_PLAN = "{{ prof.subscription_plan|default:'free' }}";
+    window.updatePlayButton = function(playing) {
+      const playBtn = document.getElementById('playToggle');
+      const icon = playBtn?.querySelector('i');
+      if (icon) {
+        icon.className = playing ? 'fas fa-stop text-lg' : 'fas fa-play text-lg';
+      }
+      if (playBtn) {
+        if (playing) {
+          playBtn.classList.add('playing');
+          playBtn.style.background = 'var(--accent-primary)';
+          playBtn.style.color = 'white';
+        } else {
+          playBtn.classList.remove('playing');
+          playBtn.style.background = 'var(--bg-card)';
+          playBtn.style.color = 'var(--text-primary)';
+        }
+      }
+      // Store global playing state
+      window.isAudioPlaying = playing;
+    };
+    
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    
+    // Input and choices interaction handler
+    (function(){
+      const input = document.getElementById('userText');
+      const choicesContainer = document.getElementById('choicesContainer');
+      
+      // Function to update choice button states based on input
+      function updateChoiceStates() {
+        if (!choicesContainer) return;
+        
+        const hasInput = input && input.value.trim().length > 0;
+        const choiceButtons = choicesContainer.querySelectorAll('.choiceBtn');
+        
+        choiceButtons.forEach(btn => {
+          // If disabled due to generation in progress, do not alter its state here
+          if (btn.hasAttribute('data-disabled-by-gen')) return;
+          if (hasInput) {
+            // Gray out and disable choices when typing
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.setAttribute('data-disabled-by-input', 'true');
+          } else {
+            // Restore normal state when input is empty (unless generation-disabled)
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.removeAttribute('data-disabled-by-input');
+          }
+        });
+      }
+      
+      // Listen for input changes
+      if (input) {
+        input.addEventListener('input', updateChoiceStates);
+        input.addEventListener('keyup', updateChoiceStates);
+        input.addEventListener('paste', () => {
+          // Small delay to let paste complete
+          setTimeout(updateChoiceStates, 10);
+        });
+      }
+      
+      // Initial state update
+      updateChoiceStates();
+      
+      // Keyboard UX: focus input with /, Esc to go back
+      document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement !== input) {
+          e.preventDefault(); input?.focus();
+        }
+        if (e.key === 'Escape') { window.location.href = "{% url 'player_home' %}"; }
+      });
+
+      // Play/Stop/Restart single button
+      const playBtn = document.getElementById('playToggle');
+      const audio = document.getElementById('ttsAudio');
+      const sfx = document.getElementById('sfxAudio');
+      // Apply sliders to volumes with dB-based scaling for more natural perception
+      const sfxSlider = document.querySelector('.modern-audio-control[aria-label="SFX volume"] input');
+      const voiceSlider = document.querySelector('.modern-audio-control[aria-label="Voice volume"] input');
+      
+      // Convert linear slider value (0-100) to exponential volume (0-1) for more natural perception
+      // This uses a simplified dB scale where 50% slider = -10dB = 0.316 volume
+      const sliderToVolume = (sliderValue) => {
+        const normalized = Number(sliderValue) / 100;
+        if (normalized <= 0) return 0;
+        if (normalized >= 1) return 1;
+        // Use exponential scaling for more natural volume perception
+        return Math.pow(normalized, 2.5);
+      };
+      
+      const setVolume = (el, v) => { 
+        try { 
+          if (el) {
+            const volume = sliderToVolume(v);
+            el.volume = Math.max(0, Math.min(1, volume));
+          }
+        } catch(_){} 
+      };
+      
+      // Make setVolume globally accessible for use in other functions
+      window.setVolume = setVolume;
+      
+      // Set initial volumes
+      if (sfxSlider && sfx) { 
+        setVolume(sfx, sfxSlider.value); 
+        sfxSlider.addEventListener('input', (e) => setVolume(sfx, e.target.value), {passive:true}); 
+      }
+      if (voiceSlider && audio) { 
+        setVolume(audio, voiceSlider.value); 
+        voiceSlider.addEventListener('input', (e) => setVolume(audio, e.target.value), {passive:true}); 
+      }
+      
+      // Store volume preferences in localStorage
+      const saveVolumePrefs = () => {
+        if (sfxSlider) localStorage.setItem('Eternalore_sfx_volume', sfxSlider.value);
+        if (voiceSlider) localStorage.setItem('Eternalore_voice_volume', voiceSlider.value);
+      };
+      
+      // Load volume preferences
+      const loadVolumePrefs = () => {
+        const sfxPref = localStorage.getItem('Eternalore_sfx_volume');
+        const voicePref = localStorage.getItem('Eternalore_voice_volume');
+        if (sfxPref && sfxSlider) {
+          sfxSlider.value = sfxPref;
+          setVolume(sfx, sfxPref);
+        }
+        if (voicePref && voiceSlider) {
+          voiceSlider.value = voicePref;
+          setVolume(audio, voicePref);
+        }
+      };
+      
+      // Load preferences on start
+      loadVolumePrefs();
+      
+      // Save preferences on change
+      if (sfxSlider) sfxSlider.addEventListener('change', saveVolumePrefs);
+      if (voiceSlider) voiceSlider.addEventListener('change', saveVolumePrefs);
+      
+      // Track user intent to prevent autoplay conflicts
+      window.userClickedStop = false;
+      
+      // Simple autoplay helper
+      const tryAutoplay = async () => {
+        const audio = document.getElementById('ttsAudio');
+        const sfx = document.getElementById('sfxAudio');
+        const playBtn = document.getElementById('playToggle');
+        
+        // Don't autoplay if user just clicked stop
+        if (window.userClickedStop) {
+          window.userClickedStop = false; // Reset flag
+          return;
+        }
+        
+        // Only attempt autoplay if the audio hasn't already finished
+        const hasAudio = !!(audio && audio.src);
+        const isPaused = !!(audio && audio.paused);
+        const notEnded = !!(audio && typeof audio.ended === 'boolean' ? !audio.ended : (audio.currentTime < (audio.duration || Infinity) - 0.05));
+        if (hasAudio && isPaused && notEnded) {
+          try {
+            await audio.play();
+            window.updatePlayButton(true);
+            // Remove pulse animation on successful play
+            if (playBtn) playBtn.classList.remove('animate-pulse');
+            // Don't add event listener here - it's already handled in playTTSWithSFX
+          } catch(e) {
+            // Autoplay blocked
+          }
+        }
+      };
+      
+      // Try autoplay on any interaction
+      document.addEventListener('click', tryAutoplay, { once: true });
+      document.addEventListener('keydown', tryAutoplay, { once: true });
+      document.addEventListener('touchstart', tryAutoplay, { once: true });
+      
+      
+      function stopAll() {
+        if (audio) {
+          audio.pause();
+          try { audio.currentTime = 0; } catch(_){}
+        }
+        if (sfx) {
+          sfx.pause();
+          try { sfx.currentTime = 0; } catch(_){}
+        }
+        // Clear any pending SFX timeouts
+        if (window.sfxTimeout) {
+          clearTimeout(window.sfxTimeout);
+          window.sfxTimeout = null;
+        }
+        // Update play button state
+        window.updatePlayButton(false);
+      }
+      if (playBtn) {
+        playBtn.addEventListener('click', async () => {
+          // Always get fresh references to audio elements
+          const currentAudio = document.getElementById('ttsAudio');
+          const currentSfx = document.getElementById('sfxAudio');
+          
+          if (!currentAudio || !currentAudio.src) return;
+          
+          // Remove pulse animation when clicked
+          playBtn.classList.remove('animate-pulse');
+          
+          // Check if either audio is playing
+          const ttsPlaying = currentAudio && !currentAudio.paused;
+          const sfxPlaying = currentSfx && !currentSfx.paused;
+          
+          if (ttsPlaying || sfxPlaying) {
+            // STOP: Set flag to prevent autoplay from restarting
+            window.userClickedStop = true;
+            
+            // STOP: Ensure both audios stop completely
+            if (currentAudio && !currentAudio.paused) {
+              currentAudio.pause();
+              // Reset current time to prevent resume from middle
+              try { currentAudio.currentTime = 0; } catch(_) {}
+            }
+            if (currentSfx && !currentSfx.paused) {
+              currentSfx.pause();
+              try { currentSfx.currentTime = 0; } catch(_) {}
+            }
+            
+            // Clear any pending SFX timeouts to prevent restart
+            if (window.sfxTimeout) {
+              clearTimeout(window.sfxTimeout);
+              window.sfxTimeout = null;
+            }
+            
+            // Update button state to stopped
+            window.updatePlayButton(false);
+          } else {
+            // START/RESTART: Play both audios
+            try {
+              // Clear any existing timeouts first
+              if (window.sfxTimeout) {
+                clearTimeout(window.sfxTimeout);
+                window.sfxTimeout = null;
+              }
+              
+              // Reset to beginning for restart
+              currentAudio.currentTime = 0;
+              if (currentSfx && currentSfx.src) {
+                currentSfx.currentTime = 0;
+              }
+              
+              // Play TTS
+              await currentAudio.play();
+              window.updatePlayButton(true);
+              
+              // Play SFX if available
+              if (currentSfx && window.currentSfxFile) {
+                // Ensure SFX has the right source
+                if (currentSfx.src !== window.currentSfxFile) {
+                  currentSfx.src = window.currentSfxFile;
+                }
+                currentSfx.play().catch(() => {});
+                // Stop SFX after a reasonable time or when TTS ends
+                const duration = Math.min(currentSfx.duration || 5, currentAudio.duration || 5);
+                window.sfxTimeout = setTimeout(() => {
+                  if (currentSfx) currentSfx.pause();
+                }, duration * 1000);
+              }
+              
+              // Handle ended event - ensure clean stop
+              currentAudio.addEventListener('ended', () => {
+                if (currentSfx) currentSfx.pause();
+                if (window.sfxTimeout) {
+                  clearTimeout(window.sfxTimeout);
+                  window.sfxTimeout = null;
+                }
+                window.updatePlayButton(false);
+              }, { once: true });
+            } catch(e) {
+              console.error('Play failed:', e);
+              window.updatePlayButton(false);
+            }
+          }
+        });
+      }
+    })();
+
+    // Choice click delegation
+    const storyLines = document.getElementById('storyLines');
+    const choicesContainer = document.getElementById('choicesContainer');
+    const currentLineText = document.getElementById('currentLineText');
+    const prevLineBtn = document.getElementById('prevLineBtn');
+    const nextLineBtn = document.getElementById('nextLineBtn');
+    let currentIndex = (function(){ const nodes = storyLines ? storyLines.querySelectorAll('.ig-story-line') : null; return nodes && nodes.length ? nodes.length - 1 : 0; })();
+
+    function lastIndex() {
+      const container = document.getElementById('storyLines');
+      const nodes = container ? container.querySelectorAll('.ig-story-line') : null;
+      return nodes && nodes.length ? nodes.length - 1 : 0;
+    }
+    function getNode(i) {
+      const container = document.getElementById('storyLines');
+      const nodes = container ? container.querySelectorAll('.ig-story-line') : null;
+      if (!nodes || !nodes.length) return null;
+      const idx = Math.max(0, Math.min(i, nodes.length - 1));
+      return nodes[idx];
+    }
+    function isViewingLast() { return currentIndex === lastIndex(); }
+    function setPlayButtonIdle() { try { const playBtn = document.getElementById('playToggle'); if (playBtn) { playBtn.innerHTML = '<i class="fas fa-play text-lg"></i>'; window.updatePlayButton(false); } } catch(_){} }
+    async function updateMediaFromNode(node, autoplay = false, skipAudioIfPlaying = false) {
+      if (!node) return;
+      const imgUrl = node.getAttribute('data-image') || '';
+      const ttsUrl = node.getAttribute('data-audio') || '';
+      const sfxName = node.getAttribute('data-sfx') || '';
+      
+      // Update image
+      try {
+        const imgEl = document.getElementById('currentGameImage');
+        const loader = document.getElementById('sceneLoader');
+        
+        if (imgEl && imgUrl) {
+          // We have a new image URL - load and display it
+          if (loader) { loader.classList.remove('hidden'); loader.classList.add('flex'); }
+          const tmp = new Image();
+          tmp.onload = () => { 
+            imgEl.src = imgUrl; 
+            imgEl.classList.remove('opacity-0'); 
+            if (loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
+            // Remove intro gradient if it exists
+            const intro = document.getElementById('introGradient');
+            if (intro) intro.remove();
+          };
+          tmp.onerror = () => { 
+            if (loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
+          };
+          tmp.src = imgUrl;
+        } else if (imgEl && !imgUrl) {
+          // No image for this turn - find the last turn with an image
+          const container = document.getElementById('storyLines');
+          const allNodes = container ? container.querySelectorAll('.ig-story-line') : [];
+          let lastImageUrl = '';
+          
+          // Search backwards from current position for the last image
+          for (let i = currentIndex; i >= 0; i--) {
+            const nodeImg = allNodes[i]?.getAttribute('data-image');
+            if (nodeImg) {
+              lastImageUrl = nodeImg;
+              break;
+            }
+          }
+          
+          // If we found a previous image, use it
+          if (lastImageUrl && imgEl.src !== lastImageUrl) {
+            imgEl.src = lastImageUrl;
+            imgEl.classList.remove('opacity-0');
+          }
+        }
+      } catch(_) {}
+      try {
+        const tts = document.getElementById('ttsAudio');
+        const sfx = document.getElementById('sfxAudio');
+        
+        // Skip audio update if currently playing and skipAudioIfPlaying is true
+        if (skipAudioIfPlaying && tts && !tts.paused) {
+          return;
+        }
+        
+        if (ttsUrl) {
+          console.log('updateMediaFromNode: Playing audio URL:', ttsUrl);
+          console.log('updateMediaFromNode: Node data-audio:', node?.getAttribute('data-audio'));
+          await playTTSWithSFX(ttsUrl, sfxName || '', autoplay);
+        } else {
+          try { if (tts) { tts.pause(); tts.removeAttribute('src'); tts.currentTime = 0; tts.style.display = 'none'; } } catch(_) {}
+          try { if (sfx) { sfx.pause(); sfx.removeAttribute('src'); sfx.currentTime = 0; sfx.style.display = 'none'; } } catch(_) {}
+          setPlayButtonIdle();
+        }
+      } catch(_) {}
+    }
+    function renderChoicesOverlay() {
+      if (!choicesContainer) return;
+      const li = lastIndex();
+      const lastNode = getNode(li);
+      const raw = lastNode ? (lastNode.getAttribute('data-choices') || '') : '';
+      const labels = raw ? raw.split('||') : [];
+      const disabled = currentIndex !== li;
+      if (!labels.length) { choicesContainer.innerHTML = ''; return; }
+      const wrap = document.createElement('div');
+      wrap.className = 'flex flex-wrap gap-2 justify-center';
+      labels.forEach((c) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'choiceBtn px-4 py-2 rounded-lg bg-white text-gray-900 text-sm font-semibold transition-all';
+        b.setAttribute('data-choice', c);
+        b.innerHTML = `<span class="truncate">${esc(c)}</span>`;
+        if (disabled) { b.setAttribute('disabled','true'); }
+        wrap.appendChild(b);
+      });
+      choicesContainer.innerHTML = '';
+      choicesContainer.appendChild(wrap);
+      
+      // Apply input-based state after rendering new choices
+      const input = document.getElementById('userText');
+      if (input && input.value.trim().length > 0) {
+        const choiceButtons = wrap.querySelectorAll('.choiceBtn');
+        choiceButtons.forEach(btn => {
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          btn.setAttribute('data-disabled-by-input', 'true');
+        });
+      }
+    }
+    function renderLinePanel() {
+      const node = getNode(currentIndex);
+      const currentLineText = document.getElementById('currentLineText');
+      const overlayLineText = document.getElementById('overlayLineText');
+      
+      if (!node) {
+        if (currentLineText) currentLineText.textContent = '';
+        if (overlayLineText) overlayLineText.innerHTML = '';
+        return;
+      }
+      
+      // Get the user input and AI response
+      const userInput = node.getAttribute('data-user-input');
+      const aiText = node.querySelector('p:last-child')?.textContent || node.querySelector('p')?.textContent || '';
+      
+      // Display both user input and AI response in both locations
+      const content = userInput
+        ? `<span class="user-choice-text">&gt; ${esc(userInput)}</span><br><span class="scene-text">${esc(aiText)}</span>`
+        : `<span class="scene-text">${esc(aiText)}</span>`;
+      
+      // Update both the hidden panel (for backward compatibility) and the overlay
+      if (currentLineText) {
+        if (userInput) {
+          currentLineText.innerHTML = `<span class="text-xs font-semibold text-blue-400 italic">&gt; ${esc(userInput)}</span><br>${esc(aiText)}`;
+        } else {
+          currentLineText.textContent = aiText;
+        }
+      }
+      
+      // Update the overlay with styled content
+      if (overlayLineText) {
+        overlayLineText.innerHTML = content;
+      }
+    }
+    async function goTo(index, autoplay = false, skipAudioIfPlaying = false) {
+      // Ensure we don't try to navigate to a non-existent turn
+      const maxIdx = lastIndex();
+      if (maxIdx < 0) {
+        console.warn('No turns available to navigate to');
+        return;
+      }
+      currentIndex = Math.max(0, Math.min(index, maxIdx));
+      renderLinePanel();
+      updateLineCounter();
+      await updateMediaFromNode(getNode(currentIndex), autoplay, skipAudioIfPlaying);
+      renderChoicesOverlay();
+      try { updateCooldownUI(); } catch(_) {}
+      // Update navigation button states
+      if (prevLineBtn) prevLineBtn.disabled = currentIndex === 0;
+      if (nextLineBtn) nextLineBtn.disabled = currentIndex === maxIdx;
+    }
+    if (prevLineBtn) prevLineBtn.addEventListener('click', () => { goTo(currentIndex - 1); });
+    if (nextLineBtn) nextLineBtn.addEventListener('click', () => { goTo(currentIndex + 1); });
+    // Update line counter
+    function updateLineCounter() {
+      const currentNum = document.getElementById('currentLineNum');
+      const total = document.getElementById('totalLines');
+      if (currentNum) currentNum.textContent = currentIndex + 1;
+      if (total) total.textContent = lastIndex() + 1;
+    }
+    
+    // Form submission
+    const userForm = document.getElementById('userForm');
+    if (userForm) {
+      userForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('userText');
+        const text = input?.value?.trim();
+        if (text && isViewingLast()) {
+          try {
+            const rem = (typeof getCooldownRemainingSeconds === 'function') ? getCooldownRemainingSeconds() : 0;
+            if (rem > 0) { return; }
+          } catch(_) {}
+          await sendTurn(text, { isChoice: false });
+        }
+      });
+    }
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      const input = document.getElementById('userText');
+      // Don't interfere with typing in the input field or any other input/textarea
+      if (document.activeElement === input || 
+          document.activeElement.tagName === 'INPUT' || 
+          document.activeElement.tagName === 'TEXTAREA') return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentIndex - 1); }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentIndex + 1); }
+      if (e.key === ' ') { e.preventDefault(); document.getElementById('playToggle')?.click(); }
+    }, { passive: false });
+    // Delegate choice clicks
+    if (choicesContainer) {
+      choicesContainer.addEventListener('click', async (e) => {
+        const target = e.target instanceof Element ? e.target.closest('.choiceBtn') : null;
+        if (!target || target.hasAttribute('disabled') || target.hasAttribute('data-disabled-by-input')) return;
+        try { const rem = getCooldownRemainingSeconds(); if (rem > 0) { return; } } catch(_) {}
+        const text = target.getAttribute('data-choice') || '';
+        console.log('Choice clicked:', text);
+        console.log('Target element:', target);
+        console.log('data-choice attribute:', target.getAttribute('data-choice'));
+        if (!text) {
+          console.error('No text found for choice!');
+          return;
+        }
+        // Only allow when viewing last
+        if (!isViewingLast()) return;
+        
+        // Disable all choice buttons and add loading state
+        const allChoices = choicesContainer.querySelectorAll('.choiceBtn');
+        allChoices.forEach(btn => {
+          btn.setAttribute('disabled', 'true');
+          // Mark as gen-disabled so setGenerating(false) re-enables
+          btn.setAttribute('data-disabled-by-gen', 'true');
+          if (btn === target) {
+            btn.classList.add('choices-loading');
+          }
+        });
+        
+        console.log('Sending choice text:', text);
+        
+        // Stop current audio before sending new turn
+        const currentAudio = document.getElementById('ttsAudio');
+        const currentSfx = document.getElementById('sfxAudio');
+        if (currentAudio && !currentAudio.paused) {
+          currentAudio.pause();
+          window.updatePlayButton(false);
+        }
+        if (currentSfx && !currentSfx.paused) {
+          currentSfx.pause();
+        }
+        
+        await sendTurn(text, { isChoice: true });
+      }, { passive: true });
+  }
+  
+  // Add retry after error functionality
+  const retryBtn = document.getElementById('retryAfterError');
+  const retryNowBtn = document.getElementById('retryNowBtn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', async () => {
+      // Hide critical error status
+      const criticalError = document.getElementById('criticalErrorStatus');
+      if (criticalError) criticalError.classList.add('hidden');
+      
+      // Get the last user input to retry
+      const lastTurn = getNode(lastIndex());
+      const lastUserInput = lastTurn ? lastTurn.getAttribute('data-user-input') : '';
+      
+      if (lastUserInput) {
+        // Retry with the last input
+        await sendTurn(lastUserInput, { isChoice: false });
+      } else {
+        // If no last input, just clear the error and let user try again
+        setError('');
+      }
+    });
+  }
+  if (retryNowBtn) {
+    retryNowBtn.addEventListener('click', async () => {
+      try {
+        const tr = document.getElementById('timeoutRetry');
+        if (tr) tr.classList.add('hidden');
+      } catch(_) {}
+      const lastTurn = getNode(lastIndex());
+      const lastUserInput = lastTurn ? lastTurn.getAttribute('data-user-input') : '';
+      if (lastUserInput) {
+        await sendTurn(lastUserInput, { isChoice: false, hideUserInput: true });
+      }
+    });
+  }
+
+    // Auto-refresh if game is still being generated
+    const HAS_PENDING_TURNS = "{% if not turns and has_pending_turns %}true{% else %}false{% endif %}" === 'true';
+    if (HAS_PENDING_TURNS) {
+      setTimeout(() => {
+        location.reload();
+      }, 5000); // Auto-refresh every 5 seconds
+    }
+    
+    // Ensure last turn is visually focused on initial load
+    (async function(){
+      // First, find and display the last generated image
+      const allNodes = document.querySelectorAll('.ig-story-line');
+      const imgEl = document.getElementById('currentGameImage');
+      if (allNodes && imgEl) {
+        // Search backwards for the last image
+        for (let i = allNodes.length - 1; i >= 0; i--) {
+          const imgUrl = allNodes[i].getAttribute('data-image');
+          if (imgUrl) {
+            imgEl.src = imgUrl;
+            imgEl.classList.remove('opacity-0');
+            const intro = document.getElementById('introGradient');
+            if (intro) intro.remove();
+            break;
+          }
+        }
+      }
+      
+      // Add a small delay to ensure DOM is ready and increase autoplay success rate
+      setTimeout(async () => {
+        // Check if we have exactly 2 turns (intro + "Let's start.")
+        const allTurns = document.querySelectorAll('.ig-story-line');
+        if (allTurns && allTurns.length === 2) {
+          // For new games with 2 turns, start with the intro
+          // Start with the world introduction (first turn)
+          await goTo(0, true); // Show intro with autoplay
+          
+          // Set up automatic transition to second turn when intro audio ends
+          const tts = document.getElementById('ttsAudio');
+          if (tts) {
+            // Use a flag to ensure this only happens once
+            if (!window.introTransitionSetup) {
+              window.introTransitionSetup = true;
+              const transitionOnce = async () => {
+                // Only transition if we're still on the intro turn AND we still have exactly 2 turns
+                const currentTurnCount = document.querySelectorAll('.ig-story-line').length;
+                if (currentIndex === 0 && currentTurnCount === 2) {
+                  // Smoothly transition to the "Let's start." turn
+                  await goTo(1, true); // Jump to second turn with autoplay
+                }
+              };
+              
+              // Listen for when intro audio ends
+              tts.addEventListener('ended', transitionOnce, { once: true });
+            }
+          }
+        } else {
+          // Default behavior: go to last turn
+          await goTo(lastIndex(), true);
+        }
+        updateLineCounter();
+        try { updateCooldownUI(); } catch(_) {}
+      }, 100);
+
+      // Global listener for rate-limit errors from api.js
+      window.addEventListener('unhandledrejection', function(e) {
+        try {
+          const reason = e && e.reason;
+          if (reason && reason.rateLimited) {
+            setGenerating(false);
+            setError('You are going too fast – please wait a moment.', false, false);
+          }
+        } catch(_) {}
+      });
+       
+     })();
+
+    async function safeJson(resp) {
+      const ct = (resp.headers && resp.headers.get && resp.headers.get('content-type')) || '';
+      if (ct && ct.indexOf('application/json') !== -1) {
+        return await resp.json();
+      }
+      const txt = await resp.text();
+      throw new Error(`Unexpected response (${resp.status}): ${txt.slice(0, 140)}`);
+    }
+    async function reserveTurn(text, { isChoice=false }={}) {
+      const fd = new FormData(); fd.append('user_text', text || ''); if (isChoice) fd.append('is_choice', '1');
+      const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken') || '';
+      const resp = await fetch('{% url "api_reserve_turn" game.id %}', { method: 'POST', headers: {'X-CSRFToken': csrf, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}, body: fd });
+      return await safeJson(resp);
+    }
+    async function pollTurn(turnId, opts={}) {
+      // Time-bound with backoff: { maxMs=90000, initialIntervalMs=1000, maxIntervalMs=5000, backoffFactor=1.5 }
+      const pattern = "{% url 'api_turn_detail' '00000000-0000-0000-0000-000000000000' %}";
+      const url = pattern.replace('00000000-0000-0000-0000-000000000000', String(turnId));
+      const hasLegacy = typeof opts.max === 'number' || typeof opts.interval === 'number';
+      const totalTimeoutMs = hasLegacy ? Math.max(0, (opts.max || 60) * (opts.interval || 1000)) : (opts.maxMs ?? 90000);
+      let delay = hasLegacy ? (opts.interval || 1000) : (opts.initialIntervalMs ?? 1000);
+      const maxDelay = hasLegacy ? Math.max(delay, 5000) : (opts.maxIntervalMs ?? 5000);
+      const factor = hasLegacy ? 1.25 : (opts.backoffFactor ?? 1.5);
+      const start = Date.now();
+      let attempt = 0;
+      while ((Date.now() - start) < totalTimeoutMs) {
+        const resp = await fetch(url, { headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'} });
+        const data = await safeJson(resp);
+        console.log(`Polling turn ${turnId}, attempt ${attempt+1}, status: ${data?.status}`);
+        if (data && (data.status === 'done' || data.status === 'failed')) return data;
+        await new Promise(r => setTimeout(r, delay));
+        delay = Math.min(maxDelay, Math.floor(delay * factor));
+        attempt += 1;
+      }
+      console.log(`Polling timed out for turn ${turnId} after ~${Math.round((Date.now()-start)/1000)}s`);
+      try {
+        const tr = document.getElementById('timeoutRetry');
+        if (tr) tr.classList.remove('hidden');
+      } catch(_) {}
+      return null;
+    }
+    function setGenerating(isGen) {
+      const s = document.getElementById('genStatus');
+      const overlayStatus = document.getElementById('overlayGenStatus');
+      const genCta = document.getElementById('genCta');
+      const overlayGenCta = document.getElementById('overlayGenCta');
+      
+      if (s) s.classList.toggle('hidden', !isGen);
+      if (overlayStatus) overlayStatus.classList.toggle('hidden', !isGen);
+      
+      // Handle CTA timer for free plan users
+      try {
+        // Clear any existing timer
+        if (window._genCtaTimer) {
+          clearTimeout(window._genCtaTimer);
+          window._genCtaTimer = null;
+        }
+        // Always hide CTA initially
+        if (genCta) genCta.classList.add('hidden');
+        if (overlayGenCta) overlayGenCta.classList.add('hidden');
+        
+        if (isGen && USER_PLAN === 'free') {
+          // Show CTA after 30 seconds of continuous generating
+          window._genCtaTimer = setTimeout(() => {
+            if (genCta && !genCta.classList.contains('hidden')) return; // already visible
+            if (document.getElementById('genStatus') && !document.getElementById('genStatus').classList.contains('hidden')) {
+              if (genCta) genCta.classList.remove('hidden');
+            }
+            if (document.getElementById('overlayGenStatus') && !document.getElementById('overlayGenStatus').classList.contains('hidden')) {
+              if (overlayGenCta) overlayGenCta.classList.remove('hidden');
+            }
+          }, 30000);
+        }
+      } catch(_) {}
+      
+      // Disable or enable choices while a turn is generating
+      try {
+        const choicesContainer = document.getElementById('choicesContainer');
+        if (choicesContainer) {
+          const buttons = choicesContainer.querySelectorAll('.choiceBtn');
+          buttons.forEach(btn => {
+            if (isGen) {
+              btn.setAttribute('disabled', 'true');
+              btn.setAttribute('data-disabled-by-gen', 'true');
+              btn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+              // Only re-enable buttons that we disabled due to generation
+              if (btn.hasAttribute('data-disabled-by-gen')) {
+                btn.removeAttribute('data-disabled-by-gen');
+                btn.removeAttribute('disabled');
+                btn.classList.remove('choices-loading');
+                // Keep gray state if input has text; otherwise restore
+                if (!(document.getElementById('userText')?.value.trim().length > 0)) {
+                  btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+              }
+            }
+          });
+        }
+      } catch(_) {}
+    }
+    
+    function setError(msg, isCritical = false, enableRetry = false) {
+      const e = document.getElementById('genError');
+      const overlayError = document.getElementById('overlayGenError');
+      const criticalError = document.getElementById('criticalErrorStatus');
+      const retryStatus = document.getElementById('retryStatus');
+      const genCta = document.getElementById('genCta');
+      const overlayGenCta = document.getElementById('overlayGenCta');
+      
+      // Hide all error states first
+      if (e) { e.classList.add('hidden'); e.textContent = ''; }
+      if (overlayError) { overlayError.classList.add('hidden'); overlayError.textContent = ''; }
+      if (criticalError) criticalError.classList.add('hidden');
+      if (retryStatus) retryStatus.classList.add('hidden');
+      if (genCta) genCta.classList.add('hidden');
+      if (overlayGenCta) overlayGenCta.classList.add('hidden');
+      
+      if (!msg) return;
+      
+      if (isCritical) {
+        // Show critical error with user-friendly message
+        if (criticalError) {
+          criticalError.classList.remove('hidden');
+          // Enable retry button if applicable
+          const retryBtn = document.getElementById('retryAfterError');
+          if (retryBtn && enableRetry) {
+            retryBtn.classList.remove('hidden');
+            retryBtn.disabled = false;
+          }
+        }
+      } else {
+        // Show normal error in both locations
+        const errorText = getUserFriendlyError(msg);
+        if (e) {
+          e.textContent = errorText;
+          e.classList.remove('hidden');
+        }
+        if (overlayError) {
+          overlayError.textContent = errorText;
+          overlayError.classList.remove('hidden');
+        }
+      }
+    }
+    
+    function showRetryStatus(attempt = 1, maxAttempts = 5) {
+      const retryStatus = document.getElementById('retryStatus');
+      const progressBar = document.getElementById('retryProgressBar');
+      
+      if (!retryStatus) return;
+      
+      retryStatus.classList.remove('hidden');
+      retryStatus.querySelector('p').textContent = `We encountered an issue and are trying again (attempt ${attempt}/${maxAttempts}). Please wait a moment.`;
+      
+      if (progressBar) {
+        const progress = (attempt / maxAttempts) * 100;
+        progressBar.style.width = `${progress}%`;
+      }
+    }
+    
+    function hideRetryStatus() {
+      const retryStatus = document.getElementById('retryStatus');
+      if (retryStatus) retryStatus.classList.add('hidden');
+    }
+    
+    function getUserFriendlyError(errorMsg) {
+      const msg = (errorMsg || '').toLowerCase();
+      
+      if (msg.includes('network') || msg.includes('connection') || msg.includes('timeout')) {
+        return 'Connection issue. Please check your internet and try again.';
+      } else if (msg.includes('quota') || msg.includes('limit') || msg.includes('rate')) {
+        return 'You\'re making requests too quickly. Please wait a moment and try again.';
+      } else if (msg.includes('generation failed') || msg.includes('llm') || msg.includes('openai')) {
+        return 'Story generation temporarily unavailable. We\'re working on it.';
+      } else if (msg.includes('media') || msg.includes('image') || msg.includes('audio')) {
+        return 'Media generation delayed. The story will continue without media.';
+      } else {
+        return 'Something went wrong. Please try again.';
+      }
+    }
+    function scrollStoryToBottom() {
+      const sc = document.getElementById('storyScroll');
+      if (sc) sc.scrollTop = sc.scrollHeight;
+    }
+    const USE_SYNC = "{% if use_sync_process %}true{% else %}false{% endif %}" === 'true';
+    function esc(s){
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    const SFX_BASE = "{% static 'sound_effects/' %}";
+
+    // ---------- Cooldown gating (client) ----------
+    function getLastTurnNode() {
+      const container = document.getElementById('storyLines');
+      const nodes = container ? container.querySelectorAll('.ig-story-line') : null;
+      if (!nodes || !nodes.length) return null;
+      return nodes[nodes.length - 1];
+    }
+    function getCooldownRemainingSeconds() {
+      const last = getLastTurnNode();
+      if (!last) return 0;
+      const completedIso = last.getAttribute('data-completed') || '';
+      const audioDurStr = last.getAttribute('data-audio-dur') || '0';
+      const completedAt = completedIso ? new Date(completedIso) : null;
+      if (!completedAt || isNaN(completedAt.getTime())) return 0;
+      const audioDur = parseFloat(audioDurStr || '0') || 0;
+      const required = (USER_PLAN === 'free') ? 20.0 : (audioDur > 0 ? audioDur * 0.75 : 0);
+      if (required <= 0) return 0;
+      const elapsed = (Date.now() - completedAt.getTime()) / 1000.0;
+      const remaining = required - elapsed;
+      return remaining > 0 ? remaining : 0;
+    }
+    function updateCooldownUI() {
+      const remaining = getCooldownRemainingSeconds();
+      const cc = document.getElementById('choicesContainer');
+      const buttons = cc ? cc.querySelectorAll('.choiceBtn') : [];
+      const isLast = isViewingLast();
+      buttons.forEach(btn => {
+        if (remaining > 0 && isLast) {
+          btn.setAttribute('disabled', 'true');
+          btn.setAttribute('data-disabled-by-cooldown', 'true');
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else if (btn.hasAttribute('data-disabled-by-cooldown')) {
+          btn.removeAttribute('data-disabled-by-cooldown');
+          if (!btn.hasAttribute('data-disabled-by-input') && !btn.hasAttribute('data-disabled-by-gen')) {
+            btn.removeAttribute('disabled');
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+          }
+        }
+      });
+    }
+    try { setInterval(() => { try { updateCooldownUI(); } catch(_) {} }, 1000); } catch(_) {}
+
+    async function playTTSWithSFX(ttsUrl, sfxFileName, autoplay = false) {
+      let tts = document.getElementById('ttsAudio');
+      const sfx = document.getElementById('sfxAudio');
+      if (!tts || !ttsUrl) return;
+
+      // Stop any currently playing audio
+      if (!tts.paused) {
+        tts.pause();
+        window.updatePlayButton(false);
+      }
+      
+      // Clear any existing timeouts
+      if (window.sfxTimeout) {
+        clearTimeout(window.sfxTimeout);
+        window.sfxTimeout = null;
+      }
+      
+      // Remove all existing event listeners by cloning
+      const newTts = tts.cloneNode(false);
+      newTts.className = tts.className;
+      newTts.id = tts.id;
+      tts.parentNode.replaceChild(newTts, tts);
+      tts = newTts; // Update reference
+      
+      // Load TTS
+      tts.src = ttsUrl;
+      
+      // Apply volume settings
+      const voiceSlider = document.querySelector('.modern-audio-control[aria-label="Voice volume"] input');
+      const sfxSlider = document.querySelector('.modern-audio-control[aria-label="SFX volume"] input');
+      if (voiceSlider && window.setVolume) {
+        window.setVolume(tts, voiceSlider.value);
+      }
+      
+      // Load SFX if available
+      if (sfx && sfxFileName) {
+        sfx.src = SFX_BASE + String(sfxFileName);
+        if (sfxSlider && window.setVolume) {
+          window.setVolume(sfx, sfxSlider.value);
+        }
+      }
+      
+      // Store SFX info for play button
+      window.currentSfxFile = sfxFileName ? SFX_BASE + String(sfxFileName) : null;
+      
+      // Set up combined event listeners for both SFX and play button state
+      tts.addEventListener('play', () => {
+        // Update play button state
+        window.updatePlayButton(true);
+        
+        // Play SFX if available
+        if (sfx && sfxFileName && sfx.paused) {
+          sfx.currentTime = 0;
+          sfx.play().catch(() => {});
+          // Stop SFX after a reasonable time or when TTS ends
+          const duration = Math.min(sfx.duration || 5, tts.duration || 5);
+          window.sfxTimeout = setTimeout(() => {
+            if (sfx) sfx.pause();
+          }, duration * 1000);
+        }
+      });
+      
+      tts.addEventListener('ended', () => {
+        window.updatePlayButton(false);
+        if (sfx) sfx.pause();
+        // Clear SFX timeout when TTS ends naturally
+        if (window.sfxTimeout) {
+          clearTimeout(window.sfxTimeout);
+          window.sfxTimeout = null;
+        }
+      });
+      
+      tts.addEventListener('pause', () => {
+        // When TTS is paused, also pause SFX and clear timeout
+        if (sfx) sfx.pause();
+        if (window.sfxTimeout) {
+          clearTimeout(window.sfxTimeout);
+          window.sfxTimeout = null;
+        }
+      });
+      
+      tts.addEventListener('error', () => {
+        window.updatePlayButton(false);
+        if (sfx) sfx.pause();
+        if (window.sfxTimeout) {
+          clearTimeout(window.sfxTimeout);
+          window.sfxTimeout = null;
+        }
+      });
+      
+      // Store reference to current audio element
+      window.currentTtsElement = tts;
+      
+      // Simple autoplay attempt
+      if (autoplay) {
+        try {
+          await tts.play();
+        } catch(e) {
+          // Autoplay blocked - show visual indicator
+          const playBtn = document.getElementById('playToggle');
+          if (playBtn) {
+            playBtn.classList.add('animate-pulse');
+          }
+        }
+      }
+    }
+    async function sendTurn(text, { isChoice=false, hideUserInput=false }={}) {
+      // Validate that we have actual text to send
+      const trimmedText = (text || '').trim();
+      if (!trimmedText) {
+        console.error('sendTurn called with empty text:', { text, isChoice, hideUserInput });
+        setError('Cannot send empty message');
+        return;
+      }
+      
+      console.log('sendTurn: Validated text:', trimmedText);
+      
+      // Clear input field if it was used
+      const input = document.getElementById('userText');
+      if (input && !isChoice) {
+        input.value = '';
+      }
+      
+      // Store user input to display with AI response
+      const userInput = trimmedText && !hideUserInput ? trimmedText : null;
+      setGenerating(true);
+      setError('');
+      // Track when we started generating for minimum display time
+      const genStartTime = Date.now();
+      try {
+        let data = null;
+        if (USE_SYNC) {
+          // Dev/DEBUG mode: process turn synchronously server-side
+          const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken') || '';
+          const resp = await fetch('{% url "api_generate_turn" game.id %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrf, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: new URLSearchParams({ user_text: trimmedText, is_choice: isChoice ? '1' : '0' })
+          });
+          
+          // Check for rate limit error BEFORE trying safeJson which can throw
+          if (resp.status === 429) {
+            let retryAfter = 60; // default fallback
+            try {
+              const errorData = await resp.json();
+              retryAfter = errorData.retry_after || 60;
+            } catch(jsonErr) {
+              console.warn('Failed to parse rate limit response JSON, using default retry time:', jsonErr);
+            }
+            
+            setError(`Rate limited. Retrying automatically in ${retryAfter} seconds...`);
+            
+            // Store the original request parameters for retry
+            const retryData = { trimmedText, isChoice, hideUserInput };
+            
+            // Set up automatic retry
+            setTimeout(async () => {
+              setError('Retrying...');
+              try {
+                await sendTurn(retryData.trimmedText, {
+                  isChoice: retryData.isChoice,
+                  hideUserInput: retryData.hideUserInput
+                });
+              } catch (retryErr) {
+                setError('Retry failed. Please try again manually.');
+                console.error('Retry failed:', retryErr);
+              }
+            }, retryAfter * 1000);
+            
+            return; // Exit early, don't process further
+          }
+          
+          data = await safeJson(resp);
+          console.log('Generate turn response:', data);
+          console.log('Response status field:', data?.status);
+          console.log('Response turn_id:', data?.turn_id);
+          if (!data || !data.ok) throw new Error(data?.error || 'Failed');
+        } else {
+          // Production path: reserve + poll
+          const reserve = await reserveTurn(trimmedText, { isChoice });
+          if (!reserve || !reserve.ok) throw new Error(reserve?.error || 'Failed to reserve');
+          data = await pollTurn(reserve.turn_id, {maxMs: 90000, initialIntervalMs: 1000, maxIntervalMs: 5000, backoffFactor: 1.5});
+          if (!data) {
+            // Optional fallback: try processing synchronously if worker stalled
+            try {
+              const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken') || '';
+              const resp = await fetch('{% url "api_process_turn" "00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', String(reserve.turn_id)), {
+                method: 'POST', headers: { 'X-CSRFToken': csrf, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+              });
+              data = await safeJson(resp);
+            } catch (_) {}
+          }
+          if (!data || !data.ok) throw new Error(data?.error || 'Generation failed');
+        }
+
+        // Handle failed status explicitly
+        if (data.status === 'failed') {
+          throw new Error(data?.error_message || 'Turn failed');
+        }
+        
+        // If turn is still processing, we need to poll for completion
+        if ((data.status === 'processing' || data.status === 'pending') && data.turn_id) {
+          console.log('Turn still processing, polling for completion...');
+          data = await pollTurn(data.turn_id, {maxMs: 90000, initialIntervalMs: 1000, maxIntervalMs: 5000, backoffFactor: 1.5});
+          if (!data || data.status !== 'done') {
+            throw new Error('Turn generation timed out or failed');
+          }
+        }
+        
+        // Don't proceed if turn is not done
+        if (data.status !== 'done') {
+          console.log('Turn status is not done, waiting for completion. Status:', data.status);
+          // If we have a turn_id but status is not done, poll for it
+          if (data.turn_id) {
+            console.log('Polling for turn completion...');
+            const pollResult = await pollTurn(data.turn_id, {maxMs: 90000, initialIntervalMs: 1000, maxIntervalMs: 5000, backoffFactor: 1.5});
+            if (pollResult && pollResult.status === 'done') {
+              data = pollResult;
+            } else {
+              throw new Error('Turn generation timed out or is still processing');
+            }
+          } else {
+            throw new Error('No turn_id available to poll');
+          }
+        }
+        
+        // Only proceed if we have actual content
+        if (!data.scene) {
+          throw new Error('No content generated');
+        }
+
+        // Append AI response with user input
+        const container = document.getElementById('storyLines');
+        const el = document.createElement('div');
+        el.className = 'ig-story-line p-3 bg-white/5 rounded-lg border border-white/10';
+        try {
+          el.setAttribute('data-image', data.image_url || '');
+          el.setAttribute('data-audio', data.tts_url || '');
+          if (data.selected_sound_effect) el.setAttribute('data-sfx', data.selected_sound_effect);
+          if (data.choices && data.choices.length) el.setAttribute('data-choices', (data.choices || []).join('||'));
+          // Store user input for navigation
+          el.setAttribute('data-user-input', userInput || '');
+          if (data.completed_at) el.setAttribute('data-completed', data.completed_at);
+          if (typeof data.audio_duration_seconds !== 'undefined') el.setAttribute('data-audio-dur', String(data.audio_duration_seconds || 0));
+        } catch(_) {}
+        
+        // Display user input only if it exists
+        if (userInput) {
+          const userP = document.createElement('p');
+          userP.className = 'text-xs font-semibold text-blue-400 mb-2 italic';
+          userP.textContent = `> ${userInput}`;
+          el.appendChild(userP);
+        }
+        
+        // Add AI response
+        const p = document.createElement('p');
+        p.className = 'text-sm leading-relaxed';
+        p.textContent = data.scene || '';
+        el.appendChild(p);
+        container?.appendChild(el);
+        
+        // Debug: Log state before and after navigation
+        console.log('Before navigation:');
+        console.log('  Total turns in DOM:', document.querySelectorAll('.ig-story-line').length);
+        console.log('  Current index:', currentIndex);
+        console.log('  Last index:', lastIndex());
+        
+        // Navigate to the new turn - this will handle UI updates and media
+        // The goTo function will handle image loading from the data attributes we set on the element
+        // We pass true for autoplay since we want the new turn's audio to play
+        const targetIndex = lastIndex();
+        console.log('Navigating to index:', targetIndex);
+        await goTo(targetIndex, true);
+        try { updateCooldownUI(); } catch(_) {}
+        // Ensure CTA is hidden after successful generation completes
+        try {
+          if (window._genCtaTimer) { clearTimeout(window._genCtaTimer); window._genCtaTimer = null; }
+          const genCtaEl = document.getElementById('genCta');
+          const overlayGenCtaEl = document.getElementById('overlayGenCta');
+          if (genCtaEl) genCtaEl.classList.add('hidden');
+          if (overlayGenCtaEl) overlayGenCtaEl.classList.add('hidden');
+        } catch(_) {}
+        
+        console.log('After navigation:');
+        console.log('  Current index:', currentIndex);
+        console.log('  Displayed turn content:', getNode(currentIndex)?.querySelector('p:last-child')?.textContent?.substring(0, 50) + '...');
+        
+      } catch (err) {
+        console.warn('Turn error:', err);
+        
+        // Check if this is a critical error from the server response
+        const isCritical = err?.message?.includes('critical') ||
+                          err?.message?.includes('System Issue');
+        
+        setError((err && err.message) || 'Request failed', isCritical, true);
+        
+        // Don't add error lines to story for critical errors - just show status
+        if (!isCritical) {
+          const container = document.getElementById('storyLines');
+          const el = document.createElement('div');
+          el.className = 'ig-story-line p-3 bg-white/5 rounded-lg border border-red-500/40';
+          el.innerHTML = `<p class=\"text-sm text-red-300\">${getUserFriendlyError((err && err.message) || 'Request failed')}</p>`;
+          container?.appendChild(el);
+        }
+        
+        try {
+          if (window.showToast) {
+            window.showToast({
+              title: isCritical ? 'System Issue' : 'Generation failed',
+              message: getUserFriendlyError((err && err.message) || 'Try again'),
+              variant: 'error',
+              timeoutMs: 3500
+            });
+          }
+        } catch(_){}
+      } finally {
+        // Ensure minimum display time for generating status (500ms) to prevent flicker
+        const genElapsed = Date.now() - genStartTime;
+        const minDisplayTime = 500;
+        if (genElapsed < minDisplayTime) {
+          await new Promise(r => setTimeout(r, minDisplayTime - genElapsed));
+        }
+        // Hide generating status after we're done (whether success or failure)
+        setGenerating(false);
+        // no scroll container in new UI
+      }
+    }
+  </script>
+ </div>
+{% endblock %}
+
+
+

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Page Not Found" %} - Eternalore{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'player-home/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-4 gradient-mesh">
+  <div class="glass glass-hover max-w-md w-full text-center p-8 rounded-2xl animate-slide-up">
+    <div class="text-8xl font-bold mb-4 font-mono text-gradient-accent">
+      404
+    </div>
+    <h1 class="text-3xl font-semibold mb-4 text-primary">{% trans "Page Not Found" %}</h1>
+    <p class="text-lg mb-8 text-secondary">
+      {% blocktrans %}The page you're looking for has vanished into another realm. It might have been moved, deleted, or never existed at all.{% endblocktrans %}
+    </p>
+    
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      {% if user.is_authenticated %}
+        <a href="{% url 'player_home' %}" class="px-6 py-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition-all duration-200 hover:-translate-y-0.5 btn-primary">
+          <i class="fas fa-gamepad"></i>
+          <span>{% trans "Back to Games" %}</span>
+        </a>
+      {% else %}
+        <a href="{% url 'landing_page' %}" class="px-6 py-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition-all duration-200 hover:-translate-y-0.5 btn-primary">
+          <i class="fas fa-home"></i>
+          <span>{% trans "Back to Home" %}</span>
+        </a>
+      {% endif %}
+      
+      <a href="{% url 'support' %}" class="px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200 hover:-translate-y-0.5 btn-secondary">
+        <i class="fas fa-life-ring"></i>
+        <span>{% trans "Get Help" %}</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

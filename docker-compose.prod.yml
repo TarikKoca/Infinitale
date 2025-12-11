@@ -1,0 +1,190 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      POSTGRES_DB: ${DB_NAME:-Eternalore}
+      POSTGRES_USER: ${DB_USER:-Eternalore}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-Eternalore}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - Eternalore-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - Eternalore-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      DEBUG: "False"
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DB_HOST: db
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      REDIS_URL: redis://redis:6379/2
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/core/var/media:/app/backend/core/var/media
+      - ./backend/core/var/logs:/app/backend/core/var/logs
+      - static_volume:/app/backend/core/var/staticfiles
+    command: >
+      bash -c "
+        cd backend/core &&
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput &&
+        gunicorn core.asgi:application \
+          --bind 0.0.0.0:8000 \
+          --workers 4 \
+          --worker-class uvicorn.workers.UvicornWorker \
+          --worker-tmp-dir /dev/shm \
+          --timeout 120 \
+          --keep-alive 5 \
+          --max-requests 1000 \
+          --max-requests-jitter 50 \
+          --access-logfile - \
+          --error-logfile - \
+          --log-level info
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - Eternalore-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      DEBUG: "False"
+      DB_HOST: db
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/core/var/media:/app/backend/core/var/media
+      - ./backend/core/var/logs:/app/backend/core/var/logs
+    command: >
+      bash -c "
+        cd backend/core &&
+        celery -A core worker \
+          -l info \
+          --concurrency=4 \
+          --max-tasks-per-child=100 \
+          --time-limit=300 \
+          --soft-time-limit=240
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A core inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - Eternalore-network
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/core/.env
+    environment:
+      DEBUG: "False"
+      DB_HOST: db
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/core/var/logs:/app/backend/core/var/logs
+    command: >
+      bash -c "
+        cd backend/core &&
+        celery -A core beat -l info
+      "
+    networks:
+      - Eternalore-network
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/sites-enabled:ro
+      - static_volume:/static:ro
+      - ./backend/core/var/media:/media:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - web
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - Eternalore-network
+
+volumes:
+  db_data:
+  redis_data:
+  static_volume:
+
+networks:
+  Eternalore-network:
+    driver: bridge

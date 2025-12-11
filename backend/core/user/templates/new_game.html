@@ -1,0 +1,525 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Create New Game" %} - Eternalore{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'player-home/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gradient-mesh overflow-hidden new-game-page">
+  <!-- Top Bar -->
+  {% include "partials/desktop_navbar.html" %}
+
+  <div class="flex pt-16">
+    <!-- Main Content -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+      <div class="max-w-4xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8">
+          <div class="flex items-center gap-4 mb-4">
+            <a href="{% url 'player_home' %}" class="btn-ghost flex items-center gap-2 text-secondary hover:text-primary">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              <span>{% trans "Back" %}</span>
+            </a>
+          </div>
+          <h1 class="text-3xl sm:text-4xl heading-primary font-black mb-2">{% trans "Create New" %}</h1>
+          <p class="text-secondary">{% trans "Customize your experience" %}</p>
+        </div>
+        
+        <!-- Form Container -->
+        <div class="grid lg:grid-cols-3 gap-6">
+          <!-- Main Form -->
+          <div class="lg:col-span-2">
+            <form id="createGameForm" class="space-y-6" method="post" action="{% url 'api_create_game' %}">
+              {% csrf_token %}
+              
+              <!-- Genre Selection -->
+              <div class="space-y-3">
+                <label class="form-label flex items-center gap-2">
+                  <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 16h4m10 0h4"></path>
+                  </svg>
+                  {% trans "Select Genre" %}
+                </label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <label class="option-card genre-option">
+                    <input type="radio" name="genre" value="mystery" class="hidden" checked>
+                    <div class="text-center">
+                      <div class="font-medium text-sm text-primary">{% trans "Mystery" %}</div>
+                    </div>
+                  </label>
+                  <label class="option-card genre-option">
+                    <input type="radio" name="genre" value="thriller" class="hidden">
+                    <div class="text-center">
+                      <div class="font-medium text-sm text-primary">{% trans "Thriller" %}</div>
+                    </div>
+                  </label>
+                  <label class="option-card genre-option">
+                    <input type="radio" name="genre" value="romance" class="hidden">
+                    <div class="text-center">
+                      <div class="font-medium text-sm text-primary">{% trans "Romance" %}</div>
+                    </div>
+                  </label>
+                  <label class="option-card genre-option">
+                    <input type="radio" name="genre" value="adventure" class="hidden">
+                    <div class="text-center">
+                      <div class="font-medium text-sm text-primary">{% trans "Adventure" %}</div>
+                    </div>
+                  </label>
+                  <label class="option-card genre-option">
+                    <input type="radio" name="genre" value="fantasy" class="hidden">
+                    <div class="text-center">
+                      <div class="font-medium text-sm text-primary">{% trans "Fantasy" %}</div>
+                    </div>
+                  </label>
+                  <label class="option-card genre-option">
+                    <input type="radio" name="genre" value="sci-fi" class="hidden">
+                    <div class="text-center">
+                      <div class="font-medium text-sm text-primary">{% trans "Sci-Fi" %}</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Character Name -->
+              <div class="space-y-2">
+                <label class="form-label flex items-center gap-2">
+                  <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  {% trans "Character Name" %}
+                </label>
+                <input type="text" name="mainCharacter" class="form-input w-full" placeholder="{% trans "Enter your character's name" %}" required>
+                <p class="text-xs text-muted">{% trans "Choose a memorable name for your protagonist" %}</p>
+              </div>
+
+              <!-- Advanced Settings Toggle -->
+              <div>
+                <button type="button" onclick="toggleMoreSettings()" class="w-full flex items-center justify-between p-4 rounded-12 bg-card hover:bg-card-hover transition-all duration-200 group">
+                  <span class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    <span class="font-semibold">{% trans "Advanced Options" %}</span>
+                    <span class="text-xs text-muted bg-card px-2 py-1 rounded-full">{% trans "Optional" %}</span>
+                  </span>
+                  <svg id="expandIcon" class="w-5 h-5 text-secondary transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Advanced Settings Content -->
+              <div id="moreSettings" class="expandable-section">
+                <div class="space-y-6">
+                  <!-- Visual Style -->
+                  <div class="space-y-3">
+                    <label class="form-label">{% trans "Visual Style" %}</label>
+                    <div class="grid grid-cols-2 gap-3">
+                      <label class="option-card style-option selected">
+                        <input type="radio" name="visualStyle" value="realistic" class="hidden" checked>
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Realistic" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Photorealistic" %}</div>
+                        </div>
+                      </label>
+                      <label class="option-card style-option">
+                        <input type="radio" name="visualStyle" value="cartoon" class="hidden">
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Cartoon" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Animated" %}</div>
+                        </div>
+                      </label>
+                      <label class="option-card style-option">
+                        <input type="radio" name="visualStyle" value="anime" class="hidden">
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Anime" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Japanese style" %}</div>
+                        </div>
+                      </label>
+                      <label class="option-card style-option">
+                        <input type="radio" name="visualStyle" value="pixel" class="hidden">
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Pixel Art" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Retro 8-bit" %}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <!-- Difficulty -->
+                  <div class="space-y-3">
+                    <label class="form-label">{% trans "Difficulty Level" %}</label>
+                    <div class="grid grid-cols-3 gap-3">
+                      <label class="option-card difficulty-option">
+                        <input type="radio" name="difficulty" value="easy" class="hidden">
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Easy" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Relaxed" %}</div>
+                        </div>
+                      </label>
+                      <label class="option-card difficulty-option selected">
+                        <input type="radio" name="difficulty" value="normal" class="hidden" checked>
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Normal" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Balanced" %}</div>
+                        </div>
+                      </label>
+                      <label class="option-card difficulty-option">
+                        <input type="radio" name="difficulty" value="hard" class="hidden">
+                        <div class="text-center">
+                          <div class="text-sm font-medium text-primary">{% trans "Hard" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "Challenging" %}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <!-- Game Length -->
+                  <div class="space-y-3">
+                    <label class="form-label">{% trans "Story Length" %}</label>
+                    <div class="grid grid-cols-2 gap-3">
+                      <label class="option-card length-option">
+                        <input type="radio" name="storyLength" value="short" class="hidden">
+                        <div>
+                          <div class="text-sm font-medium text-primary">{% trans "Short Story" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "3-5 hours gameplay" %}</div>
+                        </div>
+                      </label>
+                      <label class="option-card length-option selected">
+                        <input type="radio" name="storyLength" value="standard" class="hidden" checked>
+                        <div>
+                          <div class="text-sm font-medium text-primary">{% trans "Full Story" %}</div>
+                          <div class="text-xs text-muted mt-1">{% trans "6+ hours gameplay" %}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <!-- Additional Requests -->
+                  <div class="space-y-2">
+                    <label class="form-label">{% trans "Additional Preferences" %}</label>
+                    <textarea name="extraRequests" rows="3" class="form-textarea w-full" placeholder="{% trans "Any specific themes, settings, or story elements you'd like..." %}"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-2">
+                <button type="submit" class="btn-primary btn-brand w-full flex items-center justify-center gap-2" id="startBtn">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>{% trans "Create Game" %}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Side Panel -->
+          <div class="lg:col-span-1 space-y-6">
+            <!-- Tips Card -->
+            <div class="card">
+              <h3 class="font-semibold text-primary mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {% trans "Quick Tips" %}
+              </h3>
+              <ul class="space-y-2 text-sm text-secondary">
+                <li class="flex items-start gap-2">
+                  <span class="text-purple-400 mt-1">•</span>
+                  <span>{% trans "Your character name will be used throughout the story" %}</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-purple-400 mt-1">•</span>
+                  <span>{% trans "Advanced options let you fine-tune your experience" %}</span>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- Genre Info -->
+            <div class="card" id="genreInfo">
+              <h3 class="font-semibold text-primary mb-3">{% trans "About Mystery" %}</h3>
+              <p class="text-sm text-secondary leading-relaxed">
+                {% trans "Solve puzzles, uncover secrets, and piece together clues." %}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Card -->
+        <div id="progressCard" class="grid lg:grid-cols-3 gap-6 mt-8 hidden">
+          <div class="lg:col-span-2">
+            <div class="progress-card">
+              <div class="progress-steps">
+                <div class="step-indicator" id="step-1">
+                  <span class="text-xs font-bold">1</span>
+                </div>
+                <div class="step-indicator" id="step-2">
+                  <span class="text-xs font-bold">2</span>
+                </div>
+                <div class="step-indicator" id="step-3">
+                  <span class="text-xs font-bold">3</span>
+                </div>
+                <div class="step-indicator" id="step-4">
+                  <span class="text-xs font-bold">4</span>
+                </div>
+                <div class="step-indicator" id="step-5">
+                  <span class="text-xs font-bold">5</span>
+                </div>
+              </div>
+              
+              <div class="text-center">
+                <div class="text-lg font-semibold text-primary mb-1">Creating Your Adventure</div>
+                <div id="statusSub" class="text-sm text-secondary">Initializing...</div>
+              </div>
+              
+              <div class="mt-4">
+                <div class="h-2 bg-card rounded-full overflow-hidden">
+                  <div id="progressFill" class="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500 progress-width-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="lg:col-span-1"></div>
+        </div>
+        
+        <div id="createStatus" class="mt-4 text-center text-sm text-secondary"></div>
+      </div>
+    </main>
+  </div>
+
+  {% include "partials/mobile_bottom_nav.html" with active='new' %}
+
+  <script>
+    // Toggle advanced settings
+    function toggleMoreSettings() {
+      const section = document.getElementById('moreSettings');
+      const icon = document.getElementById('expandIcon');
+      const isExpanded = section.classList.contains('expanded');
+      
+      section.classList.toggle('expanded', !isExpanded);
+      icon.style.transform = !isExpanded ? 'rotate(180deg)' : 'rotate(0)';
+    }
+    
+    // Handle option selection
+    document.querySelectorAll('.option-card input').forEach(input => {
+      input.addEventListener('change', function() {
+        const cards = this.closest('.grid').querySelectorAll('.option-card');
+        cards.forEach(card => card.classList.remove('selected'));
+        this.closest('.option-card').classList.add('selected');
+        
+        // Update genre info if genre selection
+        if (this.name === 'genre') {
+          updateGenreInfo(this.value);
+        }
+      });
+    });
+    
+    // Initialize first genre as selected
+    document.querySelector('.genre-option input:checked').closest('.option-card').classList.add('selected');
+    
+    // Genre info updates
+    function updateGenreInfo(genre) {
+      const infoCard = document.getElementById('genreInfo');
+      const genreData = {
+        mystery: { title: 'Mystery', desc: 'Solve puzzles, uncover secrets, and piece together clues.' },
+        thriller: { title: 'Thriller', desc: 'Experience heart-pounding suspense and intense action.' },
+        romance: { title: 'Romance', desc: 'Navigate relationships and emotional connections.' },
+        adventure: { title: 'Adventure', desc: 'Embark on epic quests and explore the unknown.' },
+        fantasy: { title: 'Fantasy', desc: 'Enter realms filled with creatures and magic.' },
+        'sci-fi': { title: 'Sci-Fi', desc: 'Explore futuristic worlds and advanced technology.' }
+      };
+      
+      const data = genreData[genre] || genreData.mystery;
+      infoCard.querySelector('h3').textContent = `About ${data.title}`;
+      infoCard.querySelector('p').textContent = data.desc;
+    }
+
+    const form = document.getElementById('createGameForm');
+    const statusEl = document.getElementById('createStatus');
+    const progressCard = document.getElementById('progressCard');
+    const progressFill = document.getElementById('progressFill');
+    const statusSub = document.getElementById('statusSub');
+    const startBtn = document.getElementById('startBtn');
+    const steps = {
+      1: document.getElementById('step-1'),
+      2: document.getElementById('step-2'),
+      3: document.getElementById('step-3'),
+      4: document.getElementById('step-4'),
+      5: document.getElementById('step-5')
+    };
+    
+    function updateProgress(pct, stepNum, statusText) {
+      // Update progress bar
+      progressFill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+      
+      // Update status text
+      statusSub.textContent = statusText;
+      
+      // Update step indicators
+      Object.keys(steps).forEach(key => {
+        const num = parseInt(key);
+        if (num < stepNum) {
+          steps[key].classList.add('completed');
+          steps[key].classList.remove('active');
+        } else if (num === stepNum) {
+          steps[key].classList.add('active');
+          steps[key].classList.remove('completed');
+        } else {
+          steps[key].classList.remove('active', 'completed');
+        }
+      });
+    }
+    
+    function setProgress(pct, step) {
+      const stepMap = {
+        'initializing': { num: 1, text: 'Setting up your adventure...' },
+        'story': { num: 2, text: 'Crafting your unique storyline...' },
+        'characters': { num: 3, text: 'Creating characters and world...' },
+        'chapters': { num: 4, text: 'Planning story chapters...' },
+        'initial_turns': { num: 5, text: 'Preparing your adventure...' },
+        'finalizing': { num: 5, text: 'Finalizing your adventure...' }
+      };
+      
+      const stepData = stepMap[step] || { num: 1, text: 'Processing...' };
+      updateProgress(pct, stepData.num, stepData.text);
+    }
+
+    async function pollTask(taskId){
+      let attempts = 0;
+      let lastStep = 'initializing';
+      let lastPct = 5;
+      
+      while (attempts < 600) { // up to ~10 minutes at 1s interval
+        const url = new URL('{% url "api_create_game_status" %}', window.location.href);
+        url.searchParams.set('task_id', taskId);
+        const resp = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        console.log('Poll response:', data); // Debug logging
+        
+        if (!data.ok) { 
+          statusEl.textContent = data.error || 'Failed to get status.'; 
+          break; 
+        }
+        
+        const meta = data.progress || {};
+        
+        if (data.state === 'PROGRESS') {
+          progressCard.classList.remove('hidden');
+          // Ensure smooth progression - don't jump backwards
+          const newPct = meta.pct || lastPct;
+          const newStep = meta.step || lastStep;
+          if (newPct >= lastPct) {
+            setProgress(newPct, newStep);
+            lastPct = newPct;
+            lastStep = newStep;
+          }
+        } else if (data.state === 'SUCCESS') {
+          console.log('Success state reached, checking for game_id:', data.game_id);
+          if (data.game_id && data.redirect_url) {
+            setProgress(100, 'finalizing');
+            console.log('Redirecting to:', data.redirect_url);
+            setTimeout(() => { 
+              window.location.href = data.redirect_url; 
+            }, 400);
+            return;
+          } else {
+            console.error('Success but missing game_id or redirect_url:', data);
+            statusEl.textContent = 'Game created but redirect failed. Please refresh the page.';
+            break;
+          }
+        } else if (data.state === 'FAILURE') {
+          const errorMsg = (meta.exc_message || data.error || 'Unknown error');
+          statusEl.textContent = `Creation failed: ${errorMsg}`;
+          console.error('Game creation failed:', data);
+          if (startBtn) { 
+            startBtn.disabled = false; 
+            startBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Create Game</span>';
+          }
+          break;
+        } else if (data.state === 'PENDING') {
+          // Task hasn't started yet
+          console.log('Task pending...');
+        }
+        
+        attempts += 1;
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      
+      if (attempts >= 600) {
+        statusEl.textContent = 'Game creation timed out. Please try again.';
+        if (startBtn) { 
+          startBtn.disabled = false; 
+          startBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Create Game</span>';
+        }
+      }
+    }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = '';
+      progressCard.classList.remove('hidden');
+      progressCard.style.opacity = '0';
+      progressCard.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        progressCard.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        progressCard.style.opacity = '1';
+        progressCard.style.transform = 'translateY(0)';
+      }, 100);
+      
+      setProgress(5, 'initializing');
+      if (startBtn) {
+        startBtn.disabled = true;
+        startBtn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><span>Creating...</span>';
+      }
+      const formData = new FormData(form);
+      try {
+        const resp = await fetch("{% url 'api_create_game' %}", {
+          method: 'POST',
+          headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value, 'Accept': 'application/json' },
+          body: formData,
+        });
+        const data = await resp.json();
+        if (data.ok && data.task_id) {
+          setProgress(10, 'initializing');
+          await pollTask(data.task_id);
+        } else {
+          statusEl.textContent = data.error || 'Failed to create game.';
+          if (startBtn) { startBtn.disabled = false; startBtn.innerHTML = '<i class="fas fa-play mr-2 sm:mr-3 text-sm"></i>Start Adventure'; }
+        }
+      } catch (err) {
+        statusEl.textContent = 'Error creating game.';
+        if (startBtn) { startBtn.disabled = false; startBtn.innerHTML = '<i class="fas fa-play mr-2 sm:mr-3 text-sm"></i>Start Adventure'; }
+      }
+    });
+  </script>
+  <script>
+    (function(){
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function(e){
+          e.stopPropagation();
+          sidebar.classList.toggle('-translate-x-full');
+        });
+        document.addEventListener('click', function(e){
+          if (!sidebar.classList.contains('-translate-x-full')) {
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+              sidebar.classList.add('-translate-x-full');
+            }
+          }
+        }, { passive: true });
+      }
+    })();
+  </script>
+ </div>
+{% endblock %}
+
+

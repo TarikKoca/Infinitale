@@ -1,0 +1,1410 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-05 15:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: user/templates/404.html:5 user/templates/404.html:17
+msgid "Page Not Found"
+msgstr "Página no encontrada"
+
+#: user/templates/404.html:19
+msgid ""
+"The page you're looking for has vanished into another realm. It might have "
+"been moved, deleted, or never existed at all."
+msgstr ""
+"La página que buscas ha desaparecido a otro reino. Puede que se haya movido, "
+"eliminado o que nunca haya existido."
+
+#: user/templates/404.html:26
+msgid "Back to Games"
+msgstr "Volver a los juegos"
+
+#: user/templates/404.html:31 user/templates/login.html:62
+#: user/templates/register.html:164
+msgid "Back to Home"
+msgstr "Volver al inicio"
+
+#: user/templates/404.html:37
+msgid "Get Help"
+msgstr "Obtener ayuda"
+
+#: user/templates/429.html:3
+msgid "Too Many Requests"
+msgstr "Demasiadas solicitudes"
+
+#: user/templates/429.html:6
+msgid "You’re going too fast"
+msgstr "Vas demasiado rápido"
+
+#: user/templates/429.html:7
+#, python-format
+msgid ""
+"Please wait <span id=\"retryCountdown\">%(retry_after)s</span> seconds and "
+"try again."
+msgstr ""
+"Espera <span id=\"retryCountdown\">%(retry_after)s</span> segundos e "
+"inténtalo de nuevo."
+
+#: user/templates/429.html:8 user/templates/in_game.html:98
+msgid "Retry"
+msgstr "Reintentar"
+
+#: user/templates/500.html:3
+msgid "Server Error"
+msgstr "Error del servidor"
+
+#: user/templates/500.html:6
+msgid "Something went wrong"
+msgstr "Algo salió mal"
+
+#: user/templates/500.html:7
+msgid "Our team has been notified. Please try again in a moment."
+msgstr "Nuestro equipo ha sido notificado. Inténtalo de nuevo en un momento."
+
+#: user/templates/500.html:8 user/templates/landing_page.html:92
+#: user/templates/landing_page.html:348
+msgid "Go Home"
+msgstr "Ir al inicio"
+
+#: user/templates/account_settings.html:4
+#: user/templates/account_settings.html:26
+msgid "Account Settings"
+msgstr "Configuración de la cuenta"
+
+#: user/templates/account_settings.html:28
+msgid "Manage your profile, preferences and subscription"
+msgstr "Gestiona tu perfil, preferencias y suscripción"
+
+#: user/templates/account_settings.html:45
+msgid "Profile Information"
+msgstr "Información del perfil"
+
+#: user/templates/account_settings.html:46
+msgid "Update your account details"
+msgstr "Actualiza los detalles de tu cuenta"
+
+#: user/templates/account_settings.html:55
+msgid "Email Address"
+msgstr "Dirección de correo electrónico"
+
+#: user/templates/account_settings.html:70
+msgid "Email address cannot be changed"
+msgstr "La dirección de correo no se puede cambiar"
+
+#: user/templates/account_settings.html:78
+msgid "Save Changes"
+msgstr "Guardar cambios"
+
+#: user/templates/account_settings.html:93
+msgid "Theme Preferences"
+msgstr "Preferencias de tema"
+
+#: user/templates/account_settings.html:94
+msgid "Choose your preferred color theme"
+msgstr "Elige tu tema de color preferido"
+
+#: user/templates/account_settings.html:109
+msgid "Match System"
+msgstr "Usar tema del sistema"
+
+#: user/templates/account_settings.html:122
+msgid "Light"
+msgstr "Claro"
+
+#: user/templates/account_settings.html:136
+msgid "Dark"
+msgstr "Oscuro"
+
+#: user/templates/account_settings.html:156
+msgid "Subscription"
+msgstr "Suscripción"
+
+#: user/templates/account_settings.html:157
+msgid "Manage your plan"
+msgstr "Gestiona tu plan"
+
+#: user/templates/account_settings.html:163
+msgid "Current Plan"
+msgstr "Plan actual"
+
+#: user/templates/account_settings.html:169
+msgid "Full access enabled"
+msgstr "Acceso completo habilitado"
+
+#: user/templates/account_settings.html:176
+msgid "Unlock unlimited adventures"
+msgstr "Desbloquea aventuras ilimitadas"
+
+#: user/templates/account_settings.html:181
+msgid "Upgrade to Pro"
+msgstr "Mejorar a Pro"
+
+#: user/templates/account_settings.html:186
+msgid "View Plans"
+msgstr "Ver planes"
+
+#: user/templates/account_settings.html:197
+msgid "Manage Billing"
+msgstr "Gestionar facturación"
+
+#: user/templates/account_settings.html:206
+msgid "Account Stats"
+msgstr "Estadísticas de la cuenta"
+
+#: user/templates/account_settings.html:209
+msgid "Member Since"
+msgstr "Miembro desde"
+
+#: user/templates/account_settings.html:213
+msgid "Total Games"
+msgstr "Juegos totales"
+
+#: user/templates/account_settings.html:217
+msgid "Account Status"
+msgstr "Estado de la cuenta"
+
+#: user/templates/account_settings.html:218
+msgid "Active"
+msgstr "Activo"
+
+#: user/templates/account_settings.html:233
+msgid "Danger Zone"
+msgstr "Zona de peligro"
+
+#: user/templates/account_settings.html:234
+msgid "Irreversible account actions"
+msgstr "Acciones de cuenta irreversibles"
+
+#: user/templates/account_settings.html:240
+msgid ""
+"Deleting your account will permanently remove all your data, including "
+"games, progress, and subscription. This action cannot be undone."
+msgstr ""
+"Eliminar tu cuenta eliminará permanentemente todos tus datos, incluidos "
+"juegos, progreso y suscripción. Esta acción no se puede deshacer."
+
+#: user/templates/account_settings.html:247
+#: user/templates/account_settings.html:266
+#: user/templates/account_settings.html:337
+msgid "Delete Account"
+msgstr "Eliminar cuenta"
+
+#: user/templates/account_settings.html:267
+msgid "This action cannot be undone"
+msgstr "Esta acción no se puede deshacer"
+
+#: user/templates/account_settings.html:273
+msgid "Are you absolutely sure? This will permanently delete:"
+msgstr "¿Estás completamente seguro? Esto eliminará permanentemente:"
+
+#: user/templates/account_settings.html:280
+msgid "All your games and save data"
+msgstr "Todos tus juegos y datos guardados"
+
+#: user/templates/account_settings.html:286
+msgid "Your profile and preferences"
+msgstr "Tu perfil y preferencias"
+
+#: user/templates/account_settings.html:292
+msgid "Active subscription (no refunds)"
+msgstr "Suscripción activa (sin reembolsos)"
+
+#: user/templates/account_settings.html:300
+msgid ""
+"You have an active subscription. Account deletion is disabled until you "
+"cancel your subscription. You can manage your plan on the pricing page."
+msgstr ""
+"Tienes una suscripción activa. La eliminación de la cuenta está desactivada "
+"hasta que canceles tu suscripción. Puedes gestionar tu plan en la página de "
+"precios."
+
+#: user/templates/account_settings.html:301
+msgid "Go to Pricing"
+msgstr "Ir a precios"
+
+#: user/templates/account_settings.html:312
+msgid ""
+"Type <span class=\"font-mono bg-card px-2 py-1 rounded\">DELETE</span> to "
+"confirm"
+msgstr ""
+"Escribe <span class=\"font-mono bg-card px-2 py-1 rounded\">DELETE</span> "
+"para confirmar"
+
+#: user/templates/account_settings.html:319
+msgid "Type DELETE to confirm"
+msgstr "Escribe DELETE para confirmar"
+
+#: user/templates/account_settings.html:331 user/templates/all_games.html:302
+#: user/templates/base.html:98 user/templates/player_home.html:288
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: user/templates/all_games.html:5
+msgid "All Games"
+msgstr "Todos los juegos"
+
+#: user/templates/all_games.html:34 user/templates/in_game.html:15
+#: user/templates/new_game.html:27
+msgid "Back"
+msgstr "Atrás"
+
+#: user/templates/all_games.html:38
+msgid "Game Library"
+msgstr "Biblioteca de juegos"
+
+#: user/templates/all_games.html:43
+#, python-format
+msgid "%(n)s active game"
+msgid_plural "%(n)s active games"
+msgstr[0] "%(n)s juego activo"
+msgstr[1] "%(n)s juegos activos"
+msgstr[2] "%(n)s juegos activos"
+
+#: user/templates/all_games.html:47
+#, python-format
+msgid "<span class=\"text-secondary\">%(used)s</span> / %(limit)s slots used"
+msgstr ""
+"<span class=\"text-secondary\">%(used)s</span> / %(limit)s espacios usados"
+
+#: user/templates/all_games.html:60
+#: user/templates/partials/mobile_bottom_nav.html:16
+#: user/templates/player_home.html:45
+msgid "New Game"
+msgstr "Nuevo juego"
+
+#: user/templates/all_games.html:64 user/templates/all_games.html:188
+#: user/templates/player_home.html:49 user/templates/player_home.html:154
+#, python-format
+msgid "Game limit reached (%(used)s/%(limit)s)"
+msgstr "Límite de juegos alcanzado (%(used)s/%(limit)s)"
+
+#: user/templates/all_games.html:78
+msgid "Search games..."
+msgstr "Buscar juegos..."
+
+#: user/templates/all_games.html:84
+msgid "Recently Played"
+msgstr "Jugados recientemente"
+
+#: user/templates/all_games.html:85
+msgid "Newest First"
+msgstr "Más nuevos primero"
+
+#: user/templates/all_games.html:86
+msgid "Oldest First"
+msgstr "Más antiguos primero"
+
+#: user/templates/all_games.html:93
+msgid "Filter"
+msgstr "Filtrar"
+
+#: user/templates/all_games.html:131 user/templates/all_games.html:231
+#: user/templates/player_home.html:90 user/templates/player_home.html:197
+msgid "Delete Game"
+msgstr "Eliminar juego"
+
+#: user/templates/all_games.html:142 user/templates/player_home.html:115
+#: user/templates/player_home.html:208
+msgid "ago"
+msgstr "hace"
+
+#: user/templates/all_games.html:150
+#, fuzzy
+#| msgid "Continue Latest"
+msgid "Continue"
+msgstr "Continuar"
+
+#: user/templates/all_games.html:177 user/templates/player_home.html:143
+msgid "No games yet"
+msgstr "Aún no hay juegos"
+
+#: user/templates/all_games.html:178 user/templates/player_home.html:144
+msgid "Start your first adventure"
+msgstr "Comienza tu primera aventura"
+
+#: user/templates/all_games.html:184 user/templates/new_game.html:4
+#: user/templates/player_home.html:146 user/templates/player_home.html:150
+msgid "Create New Game"
+msgstr "Crear nuevo juego"
+
+#: user/templates/all_games.html:197 user/templates/player_home.html:163
+msgid "Archived Games"
+msgstr "Juegos archivados"
+
+#: user/templates/all_games.html:209 user/templates/all_games.html:215
+#: user/templates/player_home.html:175 user/templates/player_home.html:181
+msgid "Archived"
+msgstr "Archivado"
+
+#: user/templates/all_games.html:246
+#, python-format
+msgid "1 game archived. Upgrade your plan or delete active games to unarchive."
+msgid_plural ""
+"%(counter)s games archived. Upgrade your plan or delete active games to "
+"unarchive."
+msgstr[0] ""
+"1 juego archivado. Mejora tu plan o elimina juegos activos para desarchivar."
+msgstr[1] ""
+"%(counter)s juegos archivados. Mejora tu plan o elimina juegos activos para "
+"desarchivar."
+msgstr[2] ""
+"%(counter)s juegos archivados. Mejora tu plan o elimina juegos activos para "
+"desarchivar."
+
+#: user/templates/all_games.html:260 user/templates/all_games.html:267
+msgid "Previous"
+msgstr "Anterior"
+
+#: user/templates/all_games.html:272
+msgid "Page"
+msgstr "Página"
+
+#: user/templates/all_games.html:272
+msgid "of"
+msgstr "de"
+
+#: user/templates/all_games.html:277 user/templates/all_games.html:284
+#: user/templates/in_game.html:24
+msgid "Next"
+msgstr "Siguiente"
+
+#: user/templates/all_games.html:299 user/templates/player_home.html:285
+msgid "Delete this game?"
+msgstr "¿Eliminar este juego?"
+
+#: user/templates/all_games.html:300 user/templates/player_home.html:286
+msgid "This action cannot be undone."
+msgstr "Esta acción no se puede deshacer."
+
+#: user/templates/all_games.html:301 user/templates/player_home.html:287
+msgid "Delete"
+msgstr "Eliminar"
+
+#: user/templates/all_games.html:303 user/templates/player_home.html:289
+msgid ""
+"Are you sure you want to delete this game? This action cannot be undone."
+msgstr ""
+"¿Estás seguro de que deseas eliminar este juego? Esta acción no se puede "
+"deshacer."
+
+#: user/templates/all_games.html:304 user/templates/player_home.html:290
+msgid "deletions remaining."
+msgstr "eliminaciones restantes."
+
+#: user/templates/all_games.html:305 user/templates/player_home.html:291
+msgid "Error deleting game:"
+msgstr "Error al eliminar el juego:"
+
+#: user/templates/all_games.html:306 user/templates/player_home.html:292
+msgid "Deletion Limit Reached"
+msgstr "Límite de eliminaciones alcanzado"
+
+#: user/templates/all_games.html:307 user/templates/player_home.html:293
+#, python-format
+msgid "You have reached your deletion limit (%(used)s/%(allowed)s)."
+msgstr "Has alcanzado tu límite de eliminaciones (%(used)s/%(allowed)s)."
+
+#: user/templates/all_games.html:308 user/templates/base.html:100
+#: user/templates/player_home.html:294
+msgid "Okay"
+msgstr "Aceptar"
+
+#: user/templates/base.html:77
+msgid "You’ve reached the Free plan limit"
+msgstr "Has alcanzado el límite del plan Gratis"
+
+#: user/templates/base.html:78 user/templates/base.html:101
+#: user/templates/player_home.html:268
+msgid "Close"
+msgstr "Cerrar"
+
+#: user/templates/base.html:80
+msgid "Upgrade to keep playing with more hours, visuals, and features."
+msgstr "Actualiza para seguir jugando con más horas, imágenes y funciones."
+
+#: user/templates/base.html:82
+msgid "See Plans"
+msgstr "Ver planes"
+
+#: user/templates/base.html:83
+msgid "Not now"
+msgstr "Ahora no"
+
+#: user/templates/base.html:91
+msgid "Back online"
+msgstr "Conectado de nuevo"
+
+#: user/templates/base.html:92
+msgid "You are offline"
+msgstr "Estás sin conexión"
+
+#: user/templates/base.html:93
+msgid "Reconnecting…"
+msgstr "Reconectando…"
+
+#: user/templates/base.html:96
+msgid "Are you sure?"
+msgstr "¿Estás seguro?"
+
+#: user/templates/base.html:97
+msgid "Confirm"
+msgstr "Confirmar"
+
+#: user/templates/base.html:99
+msgid "Notification"
+msgstr "Notificación"
+
+#: user/templates/base.html:102
+msgid "Error"
+msgstr "Error"
+
+#: user/templates/base.html:103
+msgid "Warning"
+msgstr "Advertencia"
+
+#: user/templates/base.html:104
+msgid "Rate Limit Exceeded"
+msgstr "Límite de velocidad excedido"
+
+#: user/templates/base.html:105
+#, fuzzy
+#| msgid "You\\'ve made too many requests. Please wait"
+msgid "You've made too many requests. Please wait"
+msgstr "Has realizado demasiadas solicitudes. Por favor espera"
+
+#: user/templates/base.html:106
+msgid "seconds before trying again."
+msgstr "segundos antes de intentar de nuevo."
+
+#: user/templates/in_game.html:20
+#, fuzzy
+#| msgid "Back to Home"
+msgid "Back / Home"
+msgstr "Volver al inicio"
+
+#: user/templates/in_game.html:22
+#, fuzzy
+#| msgid "Previous"
+msgid "Prev"
+msgstr "Anterior"
+
+#: user/templates/in_game.html:23
+#, fuzzy
+#| msgid "Previous"
+msgid "previous"
+msgstr "Anterior"
+
+#: user/templates/in_game.html:25
+msgid "next"
+msgstr "siguiente"
+
+#: user/templates/in_game.html:27
+msgid "Play/Stop"
+msgstr "Reproducir/Detener"
+
+#: user/templates/in_game.html:28
+msgid "play/stop"
+msgstr "reproducir/detener"
+
+#: user/templates/in_game.html:30
+msgid "Submit"
+msgstr "Enviar"
+
+#: user/templates/in_game.html:31
+msgid "submit"
+msgstr "enviar"
+
+#: user/templates/in_game.html:36
+msgid "SFX volume"
+msgstr "Volumen de efectos"
+
+#: user/templates/in_game.html:41
+msgid "SFX"
+msgstr "Efectos"
+
+#: user/templates/in_game.html:45
+msgid "Voice volume"
+msgstr "Volumen de voz"
+
+#: user/templates/in_game.html:50
+msgid "Voice"
+msgstr "Voz"
+
+#: user/templates/in_game.html:78
+msgid "Loading story..."
+msgstr "Cargando historia..."
+
+#: user/templates/in_game.html:80
+msgid "No content available"
+msgstr "No hay contenido disponible"
+
+#: user/templates/in_game.html:88
+msgid "Generating..."
+msgstr "Generando..."
+
+#: user/templates/in_game.html:91
+msgid "Faster responses? Upgrade"
+msgstr "¿Respuestas más rápidas? Mejora tu plan"
+
+#: user/templates/in_game.html:97
+msgid "Taking too long. You can retry now."
+msgstr ""
+
+#: user/templates/in_game.html:104
+msgid "Loading scene…"
+msgstr "Cargando escena…"
+
+#: user/templates/in_game.html:138
+msgid "Get faster turns"
+msgstr "Obtén turnos más rápidos"
+
+#: user/templates/in_game.html:148
+msgid "System Issue Detected"
+msgstr "Se detectó un problema del sistema"
+
+#: user/templates/in_game.html:150
+msgid ""
+"We're experiencing technical difficulties and are working to resolve them. "
+"Your game progress is saved."
+msgstr ""
+"Estamos teniendo dificultades técnicas y estamos trabajando para "
+"resolverlas. Tu progreso del juego está guardado."
+
+#: user/templates/in_game.html:153
+msgid "Try Again"
+msgstr "Intentar de nuevo"
+
+#: user/templates/in_game.html:156
+msgid "Refresh"
+msgstr "Actualizar"
+
+#: user/templates/in_game.html:165
+#, fuzzy
+#| msgid "Retry"
+msgid "Retrying..."
+msgstr "Reintentar"
+
+#: user/templates/in_game.html:167
+msgid "We encountered an issue and are trying again. Please wait a moment."
+msgstr ""
+"Encontramos un problema y estamos intentando de nuevo. Por favor, espera un "
+"momento."
+
+#: user/templates/in_game.html:188
+msgid "Type your action..."
+msgstr "Escribe tu acción..."
+
+#: user/templates/in_game.html:193
+msgid "Play/Stop Audio"
+msgstr "Reproducir/Detener audio"
+
+#: user/templates/landing_page.html:4 user/templates/landing_page.html:13
+#: user/templates/landing_page.html:20
+msgid "AI Interactive Roleplaying & Gaming"
+msgstr "Juegos de rol y juegos interactivos con IA"
+
+#: user/templates/landing_page.html:6
+msgid ""
+"Create AI-powered interactive games and stories in minutes. No coding "
+"required. Jump into dynamic visual adventures with personalized characters "
+"and branching narratives."
+msgstr ""
+"Crea juegos e historias interactivos con IA en minutos. No se requiere "
+"programación. Sumérgete en aventuras visuales dinámicas con personajes "
+"personalizados y narrativas ramificadas."
+
+#: user/templates/landing_page.html:14 user/templates/landing_page.html:21
+msgid ""
+"Create AI-powered interactive games and stories in minutes. No coding "
+"required. Jump into dynamic visual adventures."
+msgstr ""
+"Crea juegos e historias interactivos con IA en minutos. No se requiere "
+"programación. Sumérgete en aventuras visuales dinámicas."
+
+#: user/templates/landing_page.html:69
+msgid "Sign in to account"
+msgstr "Inicia sesión en tu cuenta"
+
+#: user/templates/landing_page.html:70 user/templates/login.html:4
+#: user/templates/login.html:43
+msgid "Sign In"
+msgstr "Iniciar sesión"
+
+#: user/templates/landing_page.html:85
+msgid "Imagine, Start Playing"
+msgstr "Imagina, empieza a jugar"
+
+#: user/templates/landing_page.html:86
+msgid "Experience The Future Of Roleplaying With AI."
+msgstr "Experimenta el futuro del juego de rol con IA."
+
+#: user/templates/landing_page.html:90 user/templates/landing_page.html:346
+msgid "Go to home"
+msgstr "Ir al inicio"
+
+#: user/templates/landing_page.html:97 user/templates/landing_page.html:99
+#: user/templates/landing_page.html:353 user/templates/landing_page.html:355
+msgid "Start Free"
+msgstr "Empieza gratis"
+
+#: user/templates/landing_page.html:103 user/templates/landing_page.html:359
+msgid "No Credit Card Required"
+msgstr "No se requiere tarjeta de crédito"
+
+#: user/templates/landing_page.html:107 user/templates/landing_page.html:108
+#: user/templates/landing_page.html:363 user/templates/landing_page.html:364
+msgid "Plans"
+msgstr "Planes"
+
+#: user/templates/landing_page.html:122
+msgid "How It Works"
+msgstr ""
+
+#: user/templates/landing_page.html:123
+msgid "Start in Three Simple Steps"
+msgstr ""
+
+#: user/templates/landing_page.html:132
+#, fuzzy
+#| msgid "Short Story"
+msgid "Choose a Story"
+msgstr "Historia corta"
+
+#: user/templates/landing_page.html:133
+msgid "Pick a genre or write your own prompt."
+msgstr ""
+
+#: user/templates/landing_page.html:139
+msgid "Watch It Come Alive"
+msgstr ""
+
+#: user/templates/landing_page.html:140
+msgid "AI builds your story, visuals, and audio."
+msgstr ""
+
+#: user/templates/landing_page.html:146
+msgid "Jump In & Play"
+msgstr ""
+
+#: user/templates/landing_page.html:147
+msgid "Choose, see, and hear your story in real time."
+msgstr ""
+
+#: user/templates/landing_page.html:158
+msgid "Why Players Keep Coming Back"
+msgstr ""
+
+#: user/templates/landing_page.html:160
+msgid "Highly Rated"
+msgstr ""
+
+#: user/templates/landing_page.html:161
+msgid "Deep, immersive sessions"
+msgstr ""
+
+#: user/templates/landing_page.html:162
+msgid "Players return for more"
+msgstr ""
+
+#: user/templates/landing_page.html:304
+msgid "Why You'll Love Eternalore"
+msgstr ""
+
+#: user/templates/landing_page.html:312
+msgid "Stories Adapt"
+msgstr ""
+
+#: user/templates/landing_page.html:313
+msgid ""
+"Your choices truly matter. Every scene adapts to your decisions in real time."
+msgstr ""
+
+#: user/templates/landing_page.html:320
+msgid "Endless Worlds"
+msgstr ""
+
+#: user/templates/landing_page.html:321
+msgid ""
+"From detective mysteries to epic fantasies, explore countless genres and "
+"worlds."
+msgstr ""
+
+#: user/templates/landing_page.html:328
+msgid "Fully Immersive"
+msgstr ""
+
+#: user/templates/landing_page.html:329
+msgid ""
+"Experience your story with vivid visuals, cinematic sound effects, and "
+"narrated dialogue."
+msgstr ""
+
+#: user/templates/landing_page.html:340
+msgid "Ready to Bring Your Dreams to Life?"
+msgstr ""
+
+#: user/templates/landing_page.html:341
+msgid "Join thousands of players who are already roleplaying with AI"
+msgstr ""
+
+#: user/templates/landing_page.html:436
+msgid ""
+"AI-powered interactive Roleplaying that brings your imagination to life."
+msgstr ""
+
+#: user/templates/landing_page.html:448
+msgid "Product"
+msgstr ""
+
+#: user/templates/landing_page.html:450
+msgid "Features"
+msgstr ""
+
+#: user/templates/landing_page.html:451 user/templates/landing_page.html:452
+msgid "Pricing"
+msgstr ""
+
+#: user/templates/landing_page.html:457
+msgid "Support"
+msgstr ""
+
+#: user/templates/landing_page.html:459
+msgid "Help Center"
+msgstr ""
+
+#: user/templates/landing_page.html:464
+msgid "Company"
+msgstr ""
+
+#: user/templates/landing_page.html:466
+msgid "Privacy"
+msgstr ""
+
+#: user/templates/landing_page.html:467
+msgid "Terms"
+msgstr ""
+
+#: user/templates/landing_page.html:473
+msgid "All rights reserved. Made with passion."
+msgstr ""
+
+#: user/templates/login.html:18
+msgid "Welcome back"
+msgstr "Bienvenido de nuevo"
+
+#: user/templates/login.html:19
+msgid "Sign in to continue your story"
+msgstr "Inicia sesión para continuar tu historia"
+
+#: user/templates/login.html:31
+msgid "Email or Username"
+msgstr "Correo o usuario"
+
+#: user/templates/login.html:35 user/templates/register.html:39
+msgid "Password"
+msgstr "Contraseña"
+
+#: user/templates/login.html:38 user/templates/register.html:41
+msgid "Toggle password visibility"
+msgstr "Alternar visibilidad de la contraseña"
+
+#: user/templates/login.html:45
+msgid "Or continue with"
+msgstr "O continuar con"
+
+#: user/templates/login.html:46 user/templates/login.html:53
+#: user/templates/register.html:75 user/templates/register.html:82
+msgid "Continue with Google"
+msgstr "Continuar con Google"
+
+#: user/templates/login.html:56
+msgid "Forgot password?"
+msgstr "¿Olvidaste tu contraseña?"
+
+#: user/templates/login.html:59
+msgid "Don't have an account?"
+msgstr "¿No tienes una cuenta?"
+
+#: user/templates/login.html:59
+msgid "Sign up"
+msgstr "Regístrate"
+
+#: user/templates/new_game.html:30
+msgid "Create New"
+msgstr "Crear nuevo"
+
+#: user/templates/new_game.html:31
+msgid "Customize your experience"
+msgstr "Personaliza tu experiencia"
+
+#: user/templates/new_game.html:47
+msgid "Select Genre"
+msgstr "Selecciona género"
+
+#: user/templates/new_game.html:53
+msgid "Mystery"
+msgstr "Misterio"
+
+#: user/templates/new_game.html:59
+msgid "Thriller"
+msgstr "Suspenso"
+
+#: user/templates/new_game.html:65
+msgid "Romance"
+msgstr "Romance"
+
+#: user/templates/new_game.html:71
+msgid "Adventure"
+msgstr "Aventura"
+
+#: user/templates/new_game.html:77
+msgid "Fantasy"
+msgstr "Fantasía"
+
+#: user/templates/new_game.html:83
+msgid "Sci-Fi"
+msgstr "Ciencia ficción"
+
+#: user/templates/new_game.html:95
+msgid "Character Name"
+msgstr "Nombre del personaje"
+
+#: user/templates/new_game.html:97
+msgid "Enter your character's name"
+msgstr "Ingresa el nombre de tu personaje"
+
+#: user/templates/new_game.html:98
+msgid "Choose a memorable name for your protagonist"
+msgstr "Elige un nombre memorable para tu protagonista"
+
+#: user/templates/new_game.html:108
+msgid "Advanced Options"
+msgstr "Opciones avanzadas"
+
+#: user/templates/new_game.html:109
+msgid "Optional"
+msgstr "Opcional"
+
+#: user/templates/new_game.html:122
+msgid "Visual Style"
+msgstr "Estilo visual"
+
+#: user/templates/new_game.html:127
+msgid "Realistic"
+msgstr "Realista"
+
+#: user/templates/new_game.html:128
+msgid "Photorealistic"
+msgstr "Fotorrealista"
+
+#: user/templates/new_game.html:134
+msgid "Cartoon"
+msgstr "Dibujos animados"
+
+#: user/templates/new_game.html:135
+msgid "Animated"
+msgstr "Animado"
+
+#: user/templates/new_game.html:141
+msgid "Anime"
+msgstr "Anime"
+
+#: user/templates/new_game.html:142
+msgid "Japanese style"
+msgstr "Estilo japonés"
+
+#: user/templates/new_game.html:148
+msgid "Pixel Art"
+msgstr "Pixel art"
+
+#: user/templates/new_game.html:149
+msgid "Retro 8-bit"
+msgstr "Retro 8-bit"
+
+#: user/templates/new_game.html:157
+msgid "Difficulty Level"
+msgstr "Nivel de dificultad"
+
+#: user/templates/new_game.html:162
+msgid "Easy"
+msgstr "Fácil"
+
+#: user/templates/new_game.html:163
+msgid "Relaxed"
+msgstr "Relajado"
+
+#: user/templates/new_game.html:169
+msgid "Normal"
+msgstr "Normal"
+
+#: user/templates/new_game.html:170
+msgid "Balanced"
+msgstr "Equilibrado"
+
+#: user/templates/new_game.html:176
+msgid "Hard"
+msgstr "Difícil"
+
+#: user/templates/new_game.html:177
+msgid "Challenging"
+msgstr "Desafiante"
+
+#: user/templates/new_game.html:185
+msgid "Story Length"
+msgstr "Duración de la historia"
+
+#: user/templates/new_game.html:190
+msgid "Short Story"
+msgstr "Historia corta"
+
+#: user/templates/new_game.html:191
+msgid "3-5 hours gameplay"
+msgstr "3-5 horas de juego"
+
+#: user/templates/new_game.html:197
+msgid "Full Story"
+msgstr "Historia completa"
+
+#: user/templates/new_game.html:198
+msgid "6+ hours gameplay"
+msgstr "Más de 6 horas de juego"
+
+#: user/templates/new_game.html:206
+msgid "Additional Preferences"
+msgstr "Preferencias adicionales"
+
+#: user/templates/new_game.html:207
+msgid "Any specific themes, settings, or story elements you'd like..."
+msgstr "Cualquier tema, configuración o elementos de historia que desees..."
+
+#: user/templates/new_game.html:219
+msgid "Create Game"
+msgstr "Crear juego"
+
+#: user/templates/new_game.html:233
+msgid "Quick Tips"
+msgstr "Consejos rápidos"
+
+#: user/templates/new_game.html:238
+msgid "Your character name will be used throughout the story"
+msgstr "El nombre de tu personaje se usará a lo largo de la historia"
+
+#: user/templates/new_game.html:242
+msgid "Advanced options let you fine-tune your experience"
+msgstr "Las opciones avanzadas te permiten afinar tu experiencia"
+
+#: user/templates/new_game.html:249
+msgid "About Mystery"
+msgstr "Sobre Misterio"
+
+#: user/templates/new_game.html:251
+msgid "Solve puzzles, uncover secrets, and piece together clues."
+msgstr "Resuelve acertijos, descubre secretos y reúne pistas."
+
+#: user/templates/partials/desktop_navbar.html:60
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+#: user/templates/partials/mobile_bottom_nav.html:12
+msgid "Home"
+msgstr "Inicio"
+
+#: user/templates/partials/mobile_bottom_nav.html:20
+msgid "My Games"
+msgstr "Mis juegos"
+
+#: user/templates/player_home.html:4
+msgid "Player Home"
+msgstr "Inicio del jugador"
+
+#: user/templates/player_home.html:30
+#, python-format
+msgid "Welcome back, %(name)s!"
+msgstr "¡Bienvenido de nuevo, %(name)s!"
+
+#: user/templates/player_home.html:57
+msgid "Continue Latest"
+msgstr "Continuar el último"
+
+#: user/templates/player_home.html:129
+msgid "See All"
+msgstr "Ver todo"
+
+#: user/templates/player_home.html:130
+#, python-format
+msgid "%(count)s total games"
+msgstr "%(count)s juegos en total"
+
+#: user/templates/player_home.html:214
+#, fuzzy
+#| msgid ""
+#| "1 game archived. Upgrade your plan or delete active games to unarchive."
+#| msgid_plural ""
+#| "%(counter)s games archived. Upgrade your plan or delete active games to "
+#| "unarchive."
+msgid "Upgrade your plan or delete active games to unarchive"
+msgstr "Mejora tu plan o elimina juegos activos para desarchivar"
+
+#: user/templates/player_home.html:223 user/templates/player_home.html:247
+msgid "Latest Updates"
+msgstr "Últimas novedades"
+
+#: user/templates/player_home.html:225
+msgid "View all"
+msgstr "Ver todo"
+
+#: user/templates/player_home.html:248
+msgid "Stay informed about new features and improvements"
+msgstr "Mantente informado sobre nuevas funciones y mejoras"
+
+#: user/templates/player_home.html:267
+msgid "Updates are released regularly"
+msgstr "Las actualizaciones se publican regularmente"
+
+#: user/templates/register.html:4
+msgid "Sign Up"
+msgstr "Crear cuenta"
+
+#: user/templates/register.html:21
+msgid "Create your account"
+msgstr "Crea tu cuenta"
+
+#: user/templates/register.html:22
+msgid "Join and start your adventure"
+msgstr "Únete y comienza tu aventura"
+
+#: user/templates/register.html:35
+msgid "Email"
+msgstr "Correo electrónico"
+
+#: user/templates/register.html:51
+msgid "Use 8+ chars with letters, numbers, symbols"
+msgstr "Usa 8+ caracteres con letras, números y símbolos"
+
+#: user/templates/register.html:56
+msgid "Confirm Password"
+msgstr "Confirmar contraseña"
+
+#: user/templates/register.html:59
+msgid "Toggle confirm password visibility"
+msgstr "Alternar visibilidad de la confirmación de contraseña"
+
+#: user/templates/register.html:69
+#, python-format
+msgid ""
+"I agree to the <a href=\"%(terms_url)s\" class=\"underline\">Terms</a> and "
+"<a href=\"%(privacy_url)s\" class=\"underline\">Privacy Policy</a>."
+msgstr ""
+"Acepto los <a href=\"%(terms_url)s\" class=\"underline\">Términos</a> y la "
+"<a href=\"%(privacy_url)s\" class=\"underline\">Política de privacidad</a>."
+
+#: user/templates/register.html:72
+msgid "Create Account"
+msgstr "Crear cuenta"
+
+#: user/templates/register.html:74
+msgid "Or sign up with"
+msgstr "O regístrate con"
+
+#: user/templates/register.html:87
+msgid "Very weak"
+msgstr "Muy débil"
+
+#: user/templates/register.html:88
+msgid "Weak"
+msgstr "Débil"
+
+#: user/templates/register.html:89
+msgid "Good"
+msgstr "Buena"
+
+#: user/templates/register.html:90
+msgid "Strong"
+msgstr "Fuerte"
+
+#: user/templates/register.html:91
+msgid "Password must be at least 8 characters and include letters and numbers."
+msgstr ""
+"La contraseña debe tener al menos 8 caracteres e incluir letras y números."
+
+#: user/templates/register.html:92 user/views.py:418
+msgid "Passwords do not match."
+msgstr "Las contraseñas no coinciden."
+
+#: user/templates/register.html:93
+msgid "Please accept Terms and Privacy Policy."
+msgstr "Acepta los Términos y la Política de privacidad."
+
+#: user/templates/register.html:161
+msgid "Already have an account?"
+msgstr "¿Ya tienes una cuenta?"
+
+#: user/templates/register.html:161
+msgid "Sign in"
+msgstr "Iniciar sesión"
+
+#: user/views.py:344
+msgid "Invalid credentials."
+msgstr "Credenciales inválidas."
+
+#: user/views.py:364 user/views.py:376
+msgid "Authentication required"
+msgstr "Autenticación requerida"
+
+#: user/views.py:415
+msgid "Email is required."
+msgstr "Se requiere correo electrónico."
+
+#: user/views.py:421
+msgid "You must accept Terms and Privacy Policy."
+msgstr "Debes aceptar los Términos y la Política de privacidad."
+
+#: user/views.py:428
+msgid "An account with this email already exists. Please sign in."
+msgstr "Ya existe una cuenta con este correo. Inicia sesión."
+
+#: user/views.py:440
+#, python-format
+msgid "Weak password: %(error)s"
+msgstr "Contraseña débil: %(error)s"
+
+#: user/views.py:464
+msgid "Registration failed. Please try again."
+msgstr "El registro falló. Inténtalo de nuevo."
+
+#: user/views.py:476
+msgid "Invalid plan."
+msgstr "Plan inválido."
+
+#: user/views.py:490
+#, fuzzy
+#| msgid "Invalid plan."
+msgid "Invalid plan"
+msgstr "Plan inválido."
+
+#: user/views.py:494
+msgid "Billing is not configured"
+msgstr "La facturación no está configurada"
+
+#: user/views.py:505
+msgid "Price ID not configured"
+msgstr "ID de precio no configurado"
+
+#: user/views.py:540
+msgid "Checkout URL missing"
+msgstr "Falta la URL de pago"
+
+#: user/views.py:611
+#, fuzzy
+#| msgid "Create Account"
+msgid "Could not create checkout"
+msgstr "No se pudo crear el checkout"
+
+#: user/views.py:687
+#, fuzzy
+#| msgid "Game deleted successfully"
+msgid "Profile updated successfully!"
+msgstr "¡Perfil actualizado correctamente!"
+
+#: user/views.py:695
+msgid ""
+"Account deletion is blocked while your subscription is active. Please cancel "
+"your subscription first."
+msgstr ""
+"La eliminación de la cuenta está bloqueada mientras tu suscripción esté "
+"activa. Por favor, cancela tu suscripción primero."
+
+#: user/views.py:704
+#, fuzzy
+#| msgid "Your plan has been updated to %(plan)s."
+msgid "Your account has been deleted."
+msgstr "Tu cuenta ha sido eliminada."
+
+#: user/views.py:707
+#, fuzzy
+#| msgid "Type DELETE to confirm"
+msgid "Please type DELETE to confirm account deletion."
+msgstr "Escribe DELETE para confirmar la eliminación de la cuenta."
+
+#: user/views.py:825 user/views.py:1302 user/views.py:1442
+msgid "This game is archived and cannot be played."
+msgstr "Este juego está archivado y no se puede jugar."
+
+#: user/views.py:838
+msgid "Game is still being created. Please wait a moment and refresh the page."
+msgstr ""
+"El juego todavía se está creando. Espera un momento y actualiza la página."
+
+#: user/views.py:907
+msgid "Rate limit exceeded. Maximum 5 games per hour."
+msgstr "Se excedió el límite de velocidad. Máximo 5 juegos por hora."
+
+#: user/views.py:913
+#, fuzzy
+#| msgid "Invalid credentials."
+msgid "Invalid request data"
+msgstr "Datos de solicitud inválidos."
+
+#: user/views.py:1020
+#, python-format
+msgid "Game limit reached (%(limit)s). Delete or upgrade for more games."
+msgstr ""
+"Límite de juegos alcanzado (%(limit)s). Elimina o mejora para más juegos."
+
+#: user/views.py:1033
+#, fuzzy
+#| msgid ""
+#| "Game is still being created. Please wait a moment and refresh the page."
+msgid "A game is already being generated. Please wait for it to finish."
+msgstr "Ya se está generando un juego. Por favor, espera a que termine."
+
+#: user/views.py:1080 user/views.py:1271
+#, fuzzy
+#| msgid "Page Not Found"
+msgid "Game not found"
+msgstr "Juego no encontrado"
+
+#: user/views.py:1083 user/views.py:1278 user/views.py:1586 user/views.py:1621
+msgid "Permission denied"
+msgstr "Permiso denegado"
+
+#: user/views.py:1122
+#, fuzzy
+#| msgid ""
+#| "Game is still being created. Please wait a moment and refresh the page."
+msgid "Game is currently being created. Please wait a moment and try again."
+msgstr ""
+"El juego se está creando actualmente. Espera un momento e inténtalo de nuevo."
+
+#: user/views.py:1135
+#, fuzzy, python-format
+#| msgid "Game limit reached (%(used)s/%(limit)s)"
+msgid "Deletion limit reached (%(used)s/%(allowed)s)."
+msgstr "Límite de eliminaciones alcanzado (%(used)s/%(allowed)s)."
+
+#: user/views.py:1174 user/views.py:1178
+msgid "Game deleted successfully"
+msgstr "Juego eliminado correctamente"
+
+#: user/views.py:1182 user/views.py:1418 user/views.py:1419
+msgid "Internal error"
+msgstr "Error interno"
+
+#: user/views.py:1183
+msgid "An unexpected error occurred"
+msgstr "Ocurrió un error inesperado"
+
+#: user/views.py:1191
+#, fuzzy
+#| msgid "Email is required."
+msgid "task_id required"
+msgstr "Se requiere task_id"
+
+#: user/views.py:1203
+#, fuzzy
+#| msgid "Registration failed. Please try again."
+msgid "Game creation failed. Please try again."
+msgstr "La creación del juego falló. Inténtalo de nuevo."
+
+#: user/views.py:1263
+msgid "Rate limit exceeded"
+msgstr "Límite de velocidad excedido"
+
+#: user/views.py:1287 user/views.py:1452
+#, fuzzy
+#| msgid "Invalid credentials."
+msgid "Invalid request format"
+msgstr "Formato de solicitud inválido"
+
+#: user/views.py:1291 user/views.py:1457
+msgid "Missing required fields"
+msgstr "Faltan campos obligatorios"
+
+#: user/views.py:1297
+msgid "Cannot process empty message"
+msgstr "No se puede procesar un mensaje vacío"
+
+#: user/views.py:1324 user/views.py:1482
+msgid "Monthly turn limit reached for your plan."
+msgstr "Se alcanzó el límite mensual de turnos de tu plan."
+
+#: user/views.py:1332 user/views.py:1488
+#, fuzzy
+#| msgid "You\\'ve made too many requests. Please wait"
+msgid "Too many requests. Please wait a moment."
+msgstr "Demasiadas solicitudes. Por favor, espera un momento."
+
+#: user/views.py:1345 user/views.py:1504
+msgid "Monthly audio generation limit reached for your plan."
+msgstr "Se alcanzó el límite mensual de generación de audio de tu plan."
+
+#: user/views.py:1368 user/views.py:1526
+#, python-format
+msgid "Please wait %(sec)s seconds before the next action."
+msgstr "Espera %(sec)s segundos antes de la próxima acción."
+
+#: user/views.py:1387 user/views.py:1547
+msgid "No choices available at this time."
+msgstr "No hay opciones disponibles en este momento."
+
+#: user/views.py:1396 user/views.py:1549
+msgid "This choice is not available on the latest turn."
+msgstr "Esta opción no está disponible en el último turno."
+
+#: user/views.py:1580 user/views.py:1619
+#, fuzzy
+#| msgid "Page Not Found"
+msgid "Turn not found"
+msgstr "Turno no encontrado"
+
+#: user/views.py:1665
+#, python-format
+msgid "Turn is not in failed status (current: %(status)s)"
+msgstr ""
+
+#: user/views.py:1670
+#, python-format
+msgid "Maximum retry attempts (%(max)s) reached"
+msgstr ""
+
+#: user/views.py:1744
+#, fuzzy
+#| msgid "Invalid plan."
+msgid "Invalid theme"
+msgstr "Tema no válido."
+
+#: user/views.py:1753
+msgid "Failed to update theme"
+msgstr "No se pudo actualizar el tema"
+
+#: user/views.py:1764
+#, fuzzy
+#| msgid "Invalid plan."
+msgid "Invalid language"
+msgstr "Idioma no válido."
+
+#: user/views.py:1773
+msgid "Failed to update language"
+msgstr "No se pudo actualizar el idioma"
+
+#, python-format
+#~ msgid "Your plan has been updated to %(plan)s."
+#~ msgstr "Tu plan se ha actualizado a %(plan)s."
+
+#~ msgid "Language"
+#~ msgstr "Idioma"

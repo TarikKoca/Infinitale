@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Player Home" %} - Eternalore{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'player-home/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <style>
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-muted { color: var(--text-muted); }
+    .bg-card { background: var(--bg-card); }
+    .border-default { border-color: var(--border-default); }
+  </style>
+{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gradient-mesh flex flex-col">
+  {% include "partials/desktop_navbar.html" %}
+
+  <div class="flex flex-1 pt-16">
+
+    <main class="flex-1 flex flex-col p-6 lg:p-8 pb-20 md:pb-8" role="main" aria-label="Player home">
+      <!-- Content Wrapper -->
+      <div class="flex-1">
+        <!-- Hero Section -->
+        <section>
+          <div class="relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-transparent rounded-2xl blur-3xl"></div>
+            <div class="relative">
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl heading-primary font-black text-primary mb-2">{% blocktrans with name=prof.display_name %}Welcome back, {{ name }}!{% endblocktrans %}</h1>
+            </div>
+          </div>
+        </section>
+
+        <!-- Games Section -->
+        <section>
+        {% if games %}
+        <div class="section-header">
+          <div class="flex items-center gap-3">
+            {% if can_create_new %}
+            <a href="{% url 'new_game' %}" class="btn-primary flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <span>{% trans "New Game" %}</span>
+            </a>
+            {% else %}
+            <div class="px-4 py-2 bg-card border border-default rounded-lg text-secondary text-sm">
+              <span>{% blocktrans with used=active_count limit=max_games %}Game limit reached ({{ used }}/{{ limit }}){% endblocktrans %}</span>
+            </div>
+            {% endif %}
+            <a href="{% url 'in_game' games.0.id %}" class="btn-ghost flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>{% trans "Continue Latest" %}</span>
+            </a>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {% for g in games|slice:":3" %}
+          <div class="game-card group relative">
+            <div class="aspect-[3/4] relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent">
+              {% if g.cover_url %}
+                <img src="{{ g.cover_url }}" alt="{{ g.main_character_name }} - {{ g.genre_name|title }}" class="game-image w-full h-full object-cover" loading="lazy">
+              {% else %}
+                <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                  <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-3">
+                    <i class="fas fa-gamepad text-2xl text-muted"></i>
+                  </div>
+                  <span class="text-xs text-muted uppercase tracking-wider">{{ g.genre_name|title }}</span>
+                </div>
+              {% endif %}
+              
+              <!-- Three dots menu -->
+              <div class="absolute top-2 right-2 z-10">
+                <div class="dropdown">
+                  <button onclick="event.preventDefault(); event.stopPropagation(); this.nextElementSibling.classList.toggle('hidden')" class="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors">
+                    <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                  </button>
+                  <div class="hidden absolute right-0 mt-2 w-48 rounded-lg bg-card border border-default shadow-xl">
+                    <button onclick="event.preventDefault(); event.stopPropagation(); deleteGame('{{ g.id }}')" class="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-card-hover transition-colors flex items-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                      {% trans "Delete Game" %}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Overlay -->
+              <a href="{% url 'in_game' g.id %}" class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div class="absolute bottom-0 left-0 right-0 p-4">
+                  <div class="flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            
+            <div class="p-4">
+              <h3 class="font-semibold text-primary mb-1 truncate">{{ g.main_character_name }}</h3>
+              <p class="text-xs text-muted uppercase tracking-wider">{{ g.genre_name|title }}</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-xs text-muted">{{ g.created_at|timesince }} {% trans "ago" %}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% if games|length >= 4 %}
+          <!-- See All Card -->
+          <a href="{% url 'all_games' %}" class="game-card group see-all-card">
+            <div class="aspect-[3/4] relative overflow-hidden bg-gradient-to-br from-purple-600/10 to-purple-400/5">
+              <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600/20 to-purple-400/10 flex items-center justify-center mb-4 group-hover:from-purple-600/30 group-hover:to-purple-400/20 transition-all">
+                  <i class="fas fa-th text-2xl text-purple-400 group-hover:text-purple-300 transition-colors"></i>
+                </div>
+                <div class="space-y-1">
+                  <h3 class="font-semibold text-primary group-hover:text-purple-300 transition-colors">{% trans "See All" %}</h3>
+                  <p class="text-xs text-secondary">{% blocktrans with count=games|length %}{{ count }} total games{% endblocktrans %}</p>
+                </div>
+              </div>
+            </div>
+          </a>
+          {% endif %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-20">
+          <div class="w-24 h-24 rounded-full bg-card flex items-center justify-center mb-6">
+            <i class="fas fa-gamepad text-3xl text-muted"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-primary mb-2">{% trans "No games yet" %}</h3>
+          <p class="text-secondary mb-6">{% trans "Start your first adventure" %}</p>
+          {% if can_create_new %}
+          <a href="{% url 'new_game' %}" class="btn-primary flex items-center gap-2" aria-label="{% trans 'Create New Game' %}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <span>{% trans "Create New Game" %}</span>
+          </a>
+          {% else %}
+          <div class="px-4 py-2 bg-card border border-default rounded-lg text-secondary text-sm">
+            <span>{% blocktrans with used=active_count limit=max_games %}Game limit reached ({{ used }}/{{ limit }}){% endblocktrans %}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Archived Games Section -->
+        {% if archived_games %}
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold text-secondary mb-4">{% trans "Archived Games" %}</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {% for g in archived_games|slice:":8" %}
+            <div class="game-card group relative opacity-50">
+              <div class="aspect-[3/4] relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent">
+                {% if g.cover_url %}
+                  <img src="{{ g.cover_url }}" alt="{{ g.main_character_name }} - {{ g.genre_name|title }}" class="game-image w-full h-full object-cover grayscale" loading="lazy">
+                {% else %}
+                  <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                    <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-3">
+                      <i class="fas fa-archive text-2xl text-muted"></i>
+                    </div>
+                    <span class="text-xs text-muted uppercase tracking-wider">{% trans "Archived" %}</span>
+                  </div>
+                {% endif %}
+                
+                <!-- Archived Badge -->
+                <div class="absolute top-2 left-2 px-2 py-1 bg-black/70 rounded text-xs text-muted">
+                  <i class="fas fa-archive mr-1"></i> {% trans "Archived" %}
+                </div>
+                
+                <!-- Three dots menu (allow delete while archived) -->
+                <div class="absolute top-2 right-2 z-10">
+                  <div class="dropdown">
+                    <button onclick="event.preventDefault(); event.stopPropagation(); this.nextElementSibling.classList.toggle('hidden')" class="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors">
+                      <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                      </svg>
+                    </button>
+                    <div class="hidden absolute right-0 mt-2 w-48 rounded-lg bg-card border border-default shadow-xl">
+                      <button onclick="event.preventDefault(); event.stopPropagation(); deleteGame('{{ g.id }}')" class="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-card-hover transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        {% trans "Delete Game" %}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="p-4">
+                <h3 class="font-semibold text-secondary mb-1 truncate">{{ g.main_character_name }}</h3>
+                <p class="text-xs text-muted uppercase tracking-wider">{{ g.genre_name|title }}</p>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="text-xs text-muted">{{ g.created_at|timesince }} {% trans "ago" %}</span>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <p class="text-xs text-muted mt-4">{% trans "Upgrade your plan or delete active games to unarchive" %}</p>
+        </div>
+        {% endif %}
+      </section>
+      </div>
+
+      <!-- Updates Section -->
+      <section class="mt-auto pt-6">
+        <div class="section-header">
+          <h2 class="section-title text-primary">{% trans "Latest Updates" %}</h2>
+          <button id="open-updates-modal" class="section-action flex items-center gap-1">
+            <span>{% trans "View all" %}</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="card relative max-h-48 overflow-hidden">
+          <div class="prose prose-invert max-w-none text-sm">
+            {% include 'updates.html' %}
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-fade-bottom"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Updates Modal -->
+  <div id="updates-modal" class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="modal-content glass-modal rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-default">
+        <div>
+          <h3 class="text-xl font-bold text-primary">{% trans "Latest Updates" %}</h3>
+          <p class="text-sm text-secondary mt-1">{% trans "Stay informed about new features and improvements" %}</p>
+        </div>
+        <button id="close-updates-modal" class="modal-close-btn">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="flex-1 p-6 overflow-y-auto custom-scrollbar">
+        <div class="space-y-4">
+          {% include 'updates.html' %}
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-default">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-muted">{% trans "Updates are released regularly" %}</span>
+          <button id="close-modal-footer" class="btn-ghost text-sm">{% trans "Close" %}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  {% include "partials/mobile_bottom_nav.html" with active='home' %}
+  <script>
+    async function deleteGame(gameId) {
+      // Compute deletion rights text if available in DOM via data attributes rendered by server
+      const allowed = Number('{{ deletion_allowed|default:0 }}');
+      const used = Number('{{ deletion_used|default:0 }}');
+      const remaining = Math.max(allowed - used, 0);
+      const halfway = Math.floor(allowed / 2);
+      const showRemaining = used >= halfway && allowed > 0;
+      const I18N_PLAYER = {
+        deleteTitle: '{% trans "Delete this game?" %}',
+        actionCannotBeUndone: '{% trans "This action cannot be undone." %}',
+        confirmText: '{% trans "Delete" %}',
+        cancelText: '{% trans "Cancel" %}',
+        confirmQuestion: '{% trans "Are you sure you want to delete this game? This action cannot be undone." %}',
+        deletionsRemainingSuffix: '{% trans "deletions remaining." %}',
+        errorDeletingGame: '{% trans "Error deleting game:" %}',
+        deletionLimitReachedTitle: '{% trans "Deletion Limit Reached" %}',
+        deletionLimitReached: '{% blocktrans with used=deletion_used allowed=deletion_allowed %}You have reached your deletion limit ({{ used }}/{{ allowed }}).{% endblocktrans %}',
+        okay: '{% trans "Okay" %}'
+      };
+      // If no deletions remain, block before showing confirmation
+      if (allowed > 0 && remaining <= 0) {
+        if (window.showModal) {
+          await window.showModal({
+            title: I18N_PLAYER.deletionLimitReachedTitle,
+            message: I18N_PLAYER.deletionLimitReached,
+            confirmText: I18N_PLAYER.okay,
+            variant: 'danger'
+          });
+        } else {
+          alert(I18N_PLAYER.deletionLimitReached);
+        }
+        return;
+      }
+      const extra = showRemaining ? `\n\n${remaining}/${allowed} ${I18N_PLAYER.deletionsRemainingSuffix}` : '';
+      const confirmed = await (window.showConfirm ? window.showConfirm({
+        title: I18N_PLAYER.deleteTitle,
+        message: I18N_PLAYER.actionCannotBeUndone + extra,
+        confirmText: I18N_PLAYER.confirmText,
+        cancelText: I18N_PLAYER.cancelText,
+        variant: 'danger'
+      }) : Promise.resolve(confirm(I18N_PLAYER.confirmQuestion + extra)));
+      if (!confirmed) return;
+
+      fetch(`{% url 'api_delete_game' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', gameId), {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(async (response) => {
+        if (!response.ok) {
+          let body = null;
+          try { body = await response.text(); } catch(e) {}
+          throw new Error(`HTTP ${response.status} ${response.statusText} - ${body || 'no body'}`);
+        }
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          let body = null;
+          try { body = await response.text(); } catch(e) {}
+          throw new Error(`Non-JSON response: ${body || 'no body'}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.ok) {
+          location.reload();
+        } else {
+          alert(I18N_PLAYER.errorDeletingGame + ' ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Delete game error:', error);
+        alert(I18N_PLAYER.errorDeletingGame + ' ' + error.message);
+      });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown > div').forEach(menu => {
+          menu.classList.add('hidden');
+        });
+      }
+    });
+    
+    (function(){
+
+      // Smooth animations on load
+      const animateOnLoad = () => {
+        const elements = document.querySelectorAll('.game-card, .stat-card');
+        elements.forEach((el, index) => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          setTimeout(() => {
+            el.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }, index * 50);
+        });
+      };
+      animateOnLoad();
+
+      // Updates Modal
+      const updatesModal = document.getElementById('updates-modal');
+      const openUpdatesModalBtn = document.getElementById('open-updates-modal');
+      const closeUpdatesModalBtn = document.getElementById('close-updates-modal');
+
+      if (updatesModal && openUpdatesModalBtn && closeUpdatesModalBtn) {
+          openUpdatesModalBtn.addEventListener('click', () => {
+              updatesModal.classList.remove('hidden');
+              updatesModal.classList.add('flex');
+          });
+
+          const closeModal = () => {
+              updatesModal.classList.add('closing');
+              setTimeout(() => {
+                  updatesModal.classList.add('hidden');
+                  updatesModal.classList.remove('flex', 'closing');
+              }, 300);
+          };
+
+          closeUpdatesModalBtn.addEventListener('click', closeModal);
+          
+          const closeFooterBtn = document.getElementById('close-modal-footer');
+          if (closeFooterBtn) {
+            closeFooterBtn.addEventListener('click', closeModal);
+          }
+
+          updatesModal.addEventListener('click', (e) => {
+              if (e.target === updatesModal) {
+                  closeModal();
+              }
+          });
+          
+          // ESC key to close modal
+          document.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape' && !updatesModal.classList.contains('hidden')) {
+                  closeModal();
+              }
+          });
+      }
+    })();
+  </script>
+ </div>
+{% endblock %}
+
+

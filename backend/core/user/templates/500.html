@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Server Error" %}{% endblock %}
+{% block content %}
+<main class="min-h-screen flex flex-col items-center justify-center text-center p-6">
+  <h1 class="text-4xl font-bold mb-4">{% trans "Something went wrong" %}</h1>
+  <p class="text-lg mb-6">{% trans "Our team has been notified. Please try again in a moment." %}</p>
+  <a href="/" class="px-5 py-3 rounded-lg font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-600">{% trans "Go Home" %}</a>
+</main>
+{% endblock %}

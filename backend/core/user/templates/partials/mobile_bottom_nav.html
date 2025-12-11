@@ -1,0 +1,25 @@
+{% load static %}
+{% load i18n %}
+<style>
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.hover\:text-primary:hover { color: var(--text-primary); }
+</style>
+<nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50" role="navigation" aria-label="Mobile bottom navigation">
+  <div class="flex justify-around items-center">
+    <a href="{% url 'player_home' %}" class="flex flex-col items-center py-2 px-3 {% if active == 'home' %}text-primary{% else %}text-secondary hover:text-primary{% endif %} transition-colors"{% if active == 'home' %} aria-current="page"{% endif %}>
+      <i class="fas fa-home text-lg mb-1"></i>
+      <span class="text-[11px] tracking-wide">{% trans "Home" %}</span>
+    </a>
+    <a href="{% url 'new_game' %}" class="flex flex-col items-center py-2 px-3 {% if active == 'new' %}text-primary{% else %}text-secondary hover:text-primary{% endif %} transition-colors"{% if active == 'new' %} aria-current="page"{% endif %}>
+      <i class="fas fa-plus-circle text-xl {% if active == 'new' %}text-blue-300{% else %}text-blue-400 hover:text-blue-300{% endif %} transition-colors"></i>
+      <span class="sr-only">{% trans "New Game" %}</span>
+    </a>
+    <a href="{% url 'all_games' %}" class="flex flex-col items-center py-2 px-3 {% if active == 'games' %}text-primary{% else %}text-secondary hover:text-primary{% endif %} transition-colors"{% if active == 'games' %} aria-current="page"{% endif %}>
+      <i class="fas fa-gamepad text-lg mb-1"></i>
+      <span class="text-[11px] tracking-wide">{% trans "My Games" %}</span>
+    </a>
+  </div>
+</nav>
+
+

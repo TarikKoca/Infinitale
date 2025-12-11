@@ -1,0 +1,153 @@
+{
+  "title": "Fantasy",
+  "disclaimer": "Eternalore demo. This is an imitation of the actual product.",
+  "cta": { 
+    "title": "The Festival is not over.", 
+    "label": "Unlock Full Access", 
+    "href": "/register/" 
+  },
+    "steps": [
+      {
+        "base": {
+          "text": "Lanterns sway in the night breeze, painting the village square with flickering gold and crimson. Drums echo in steady rhythm, joined by pipes and laughter. Masked dancers whirl past you, their steps strangely precise—as if the dance has been rehearsed for centuries. You feel the pull of the music, deeper and deeper, toward the heart of the festival.",
+          "image": "/static/demo/Fantasy/image/scene1_base.jpg",
+          "audio": "/static/demo/Fantasy/audio/scene1_base.wav"
+        },
+        "choices": [
+          {
+            "label": "Watch the dancers", 
+            "variant": {
+              "text": "You linger at the edge, watching the dancers’ steps. They are beautiful, yet unsettling—too precise, as though rehearsed for too long. The drums quicken. The masks no longer look playful—sharp teeth, hollow eyes, painted smiles too wide. A villager leans close, whispering through their mask: ‘It begins.’ The crowd’s laughter falters, replaced by low chanting beneath the music. Your chest tightens. Are you still a guest here—or the offering?",
+              "image": "/static/demo/Fantasy/image/scene2_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene1_choice1.wav"
+            }
+          },
+          {
+            "label": "Follow the drums", 
+            "variant": {
+              "text": "The drums call to you. You drift closer to their pulsing rhythm, your heartbeat quickening as the sound fills your chest. The drums quicken. The masks no longer look playful—sharp teeth, hollow eyes, painted smiles too wide. A villager leans close, whispering through their mask: ‘It begins.’ The crowd’s laughter falters, replaced by low chanting beneath the music. Your chest tightens. Are you still a guest here—or the offering?",
+              "image": "/static/demo/Fantasy/image/scene2_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene1_choice2.wav"
+            }
+          },
+          {
+            "label": "Approach a masked villager", 
+            "variant": {
+              "text": "You step toward a villager. Their mask tilts toward you in silence, unreadable, before they melt back into the crowd. The drums quicken. The masks no longer look playful—sharp teeth, hollow eyes, painted smiles too wide. A villager leans close, whispering through their mask: ‘It begins.’ The crowd’s laughter falters, replaced by low chanting beneath the music. Your chest tightens. Are you still a guest here—or the offering?",
+              "image": "/static/demo/Fantasy/image/scene2_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene1_choice3.wav"
+            }
+          }
+        ]
+      },
+      {
+        "choices": [
+          {
+            "label": "Step back toward the edge of the festival", 
+            "variant": {
+              "text": "You feel the press of the crowd behind you, blocking escape. The dancers encircle you, their steps pounding in unison. At the center of the square rises a stone altar, carved with glowing runes. No matter where you turn, the circle closes tighter. Hands press at your back, guiding, forcing—until you stand before the altar. The chanting rises, and you realize every masked face is turned toward you.",
+              "image": "/static/demo/Fantasy/image/scene3_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene2_choice1.wav"
+            }
+          },
+          {
+            "label": "Join the circle of dancers", 
+            "variant": {
+              "text": "The circle parts just enough for you to enter, only to close around you. The dancers encircle you, their steps pounding in unison. At the center of the square rises a stone altar, carved with glowing runes. No matter where you turn, the circle closes tighter. Hands press at your back, guiding, forcing—until you stand before the altar. The chanting rises, and you realize every masked face is turned toward you.",
+              "image": "/static/demo/Fantasy/image/scene3_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene2_choice2.wav"
+            }
+          },
+          {
+            "label": "Demand answers from the masked whisperer", 
+            "variant": {
+              "text": "The whisperer says nothing—just stares, unmoving. The dancers encircle you, their steps pounding in unison. At the center of the square rises a stone altar, carved with glowing runes. No matter where you turn, the circle closes tighter. Hands press at your back, guiding, forcing—until you stand before the altar. The chanting rises, and you realize every masked face is turned toward you.",
+              "image": "/static/demo/Fantasy/image/scene3_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene2_choice3.wav"
+            }
+          }
+        ]
+      },
+      {
+        "choices": [
+          {
+            "label": "Resist being pushed forward", 
+            "variant": {
+              "text": "Hands grip harder at your arms, forcing you forward. Symbols blaze to life beneath your feet, burning lines into the earth. Energy surges upward, searing through your veins. Pain and power entwine—you stumble, caught between falling and floating. The chanting crescendos, louder, faster, until the sound drowns everything else. The ritual is no longer around you. It is inside you.",
+              "image": "/static/demo/Fantasy/image/scene4_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene3_choice1.wav"
+            }
+          },
+          {
+            "label": "Stay calm and walk willingly", 
+            "variant": {
+              "text": "The villagers part, guiding you smoothly but inevitably. Symbols blaze to life beneath your feet, burning lines into the earth. Energy surges upward, searing through your veins. Pain and power entwine—you stumble, caught between falling and floating. The chanting crescendos, louder, faster, until the sound drowns everything else. The ritual is no longer around you. It is inside you.",
+              "image": "/static/demo/Fantasy/image/scene4_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene3_choice2.wav"
+            }
+          },
+          {
+            "label": "Call out to the crowd", 
+            "variant": {
+              "text": "Your voice drowns beneath the chant, masks staring in silence. Symbols blaze to life beneath your feet, burning lines into the earth. Energy surges upward, searing through your veins. Pain and power entwine—you stumble, caught between falling and floating. The chanting crescendos, louder, faster, until the sound drowns everything else. The ritual is no longer around you. It is inside you.",
+              "image": "/static/demo/Fantasy/image/scene4_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene3_choice3.wav"
+            }
+          }
+        ]
+      },
+      {
+        "choices": [
+          {
+            "label": "Fight against the runes", 
+            "variant": {
+              "text": "Pain intensifies, the energy lashing violently. The altar erupts in light. The circle collapses to its knees as masked villagers bow. Symbols burn across your skin, glowing faintly even as the night darkens. The music stops. Silence hangs heavy—until one voice rises above the others, trembling with reverence: ‘The Chosen One has awakened.’",
+              "image": "/static/demo/Fantasy/image/scene5_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene4_choice1.wav"
+            }
+          },
+          {
+            "label": "Try to flee the circle", 
+            "variant": {
+              "text": "Your legs buckle as glowing symbols chain you to the spot. The altar erupts in light. The circle collapses to its knees as masked villagers bow. Symbols burn across your skin, glowing faintly even as the night darkens. The music stops. Silence hangs heavy—until one voice rises above the others, trembling with reverence: ‘The Chosen One has awakened.’",
+              "image": "/static/demo/Fantasy/image/scene5_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene4_choice2.wav"
+            }
+          },
+          {
+            "label": "Stand still and accept", 
+            "variant": {
+              "text": "The surge feels almost like breath—terrible and sacred at once. The altar erupts in light. The circle collapses to its knees as masked villagers bow. Symbols burn across your skin, glowing faintly even as the night darkens. The music stops. Silence hangs heavy—until one voice rises above the others, trembling with reverence: ‘The Chosen One has awakened.’",
+              "image": "/static/demo/Fantasy/image/scene5_base.jpg",
+              "audio": "/static/demo/Fantasy/audio/scene4_choice3.wav"
+            }
+          }
+        ]
+      },
+      {
+        "choices": [
+          {
+            "label": "Look at the villagers bowing", 
+            "variant": {
+              "text": "You hear the rustle of robes. The Festival is not over. The villagers await your choice—will you return?",
+              "audio": "/static/demo/Fantasy/audio/scene5_choice1.wav"
+            }
+          },
+          {
+            "label": "Look at the runes on your body", 
+            "variant": {
+              "text": "Faint smoke curls upward from the glowing sigils etched into your skin. The Festival is not over. The villagers await your choice—will you return?",
+              "audio": "/static/demo/Fantasy/audio/scene5_choice2.wav"
+            }
+          },
+          {
+            "label": "Look up to the night sky", 
+            "variant": {
+              "text": "The stars seem to shift, patterns warping. The Festival is not over. The villagers await your choice—will you return?",
+              "audio": "/static/demo/Fantasy/audio/scene5_choice3.wav"
+            }
+          }
+      	]
+      }
+  ]
+}

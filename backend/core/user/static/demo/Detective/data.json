@@ -1,0 +1,32 @@
+{
+  "title": "Detective • Midnight in Gray Harbor",
+  "disclaimer": "Eternalore demo. This is not the actual product.",
+  "cta": { "title": "Crack the Full Case", "label": "Start your investigation", "href": "/register/" },
+  "steps": [
+    {
+      "base": {
+        "text": "Rain needles the pavement. A flickering streetlamp reveals a torn postcard.",
+        "image": "/static/demo/Detective/image/step1.svg",
+        "audio": "/static/sound_effects/rain.wav"
+      },
+      "choices": [
+        {"label": "Examine postcard", "variant": {"text": "A lighthouse sketch. Coordinates scribbled on the back.", "image": "/static/demo/Detective/image/choice1a.svg", "audio": "/static/sound_effects/glass.wav"}},
+        {"label": "Survey the alley", "variant": {"text": "Footprints loop back—someone doubled around.", "image": "/static/demo/Detective/image/choice1b.svg", "audio": "/static/sound_effects/human_running.wav"}}
+      ]
+    },
+    {
+      "choices": [
+        {"label": "Call the harbor master", "variant": {"text": "He stammers—dock 7 shows unusual activity.", "image": "/static/demo/Detective/image/choice2a.svg", "audio": "/static/sound_effects/knock.wav"}},
+        {"label": "Visit the lighthouse", "variant": {"text": "The beam cuts through fog, revealing a moored skiff.", "image": "/static/demo/Detective/image/choice2b.svg", "audio": "/static/sound_effects/wind.wav"}}
+      ]
+    },
+    {
+      "choices": [
+        {"label": "Photograph the entries", "variant": {"text": "A pattern emerges: shipments every third night.", "image": "/static/demo/Detective/image/choice3a.svg", "audio": "/static/sound_effects/flashlight.wav"}},
+        {"label": "Trace the signatures", "variant": {"text": "Aliases point to one orchestrator: The Keeper.", "image": "/static/demo/Detective/image/choice3b.svg", "audio": "/static/sound_effects/magic.wav"}}
+      ]
+    }
+  ]
+}
+
+

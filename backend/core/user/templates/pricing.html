@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Pricing Plans - Eternalore AI Interactive Roleplaying{% endblock %}
+{% block head %}
+  <meta name="description" content="Choose the perfect plan for creating AI-powered interactive games and stories.">
+  <meta name="keywords" content="AI game creator pricing, interactive Roleplaying plans, visual novel maker cost, AI story generator subscription">
+  <meta name="author" content="Eternalore">
+  <meta name="robots" content="index, follow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-x-hidden max-w-full m-0">
+  <!-- Navbar -->
+  <nav id="navbar" data-static-navbar class="fixed top-0 left-0 right-0 z-50 select-none navbar-default navbar-contrast-light rounded-3xl" role="navigation" aria-label="Main navigation">
+    <div class="flex justify-between items-center" id="nav-content">
+      <!-- Logo -->
+      <div class="flex flex-col justify-start items-center">
+        <div id="logo-container" class="flex flex-row justify-start items-center bg-slate-100/80 backdrop-blur-sm border border-slate-200 rounded-xl p-2 shadow-sm">
+          <a href="{% url 'landing_page' %}">
+            <img class="landing-logo h-10 md:h-12 w-10 md:w-12 drop-shadow-lg" src="{% static 'images/logo_black.png' %}" alt="Eternalore Logo" loading="lazy">
+          </a>
+        </div>
+      </div>
+      
+      <!-- Navbar Buttons (visible on all viewports) -->
+      <div class="flex items-center justify-center space-x-3">
+        <div class="nav-button-container flex items-center gap-2">
+          {% if request.user.is_authenticated %}
+            {% if HAS_HOME %}
+              <a href="{% url 'player_home' %}" class="font-semibold px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-white/50 select-none cursor-pointer shadow-md hover:shadow-lg" aria-label="Go to home">
+                <span>My Home</span>
+              </a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 select-none cursor-pointer shadow-md hover:shadow-lg" aria-label="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}" class="font-semibold px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-white/50 select-none cursor-pointer shadow-md hover:shadow-lg" aria-label="Sign in to account">
+              <span>Sign In</span>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    
+  </nav>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="py-16 md:py-24 bg-slate-50">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 fade-in-up">Choose Your Dream Plan</h2>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto fade-in-up">Begin your journey with plans designed for everyone</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+        <!-- Lite Plan -->
+        <div class="relative group">
+          <div class="bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all duration-300 h-full flex flex-col group-hover:scale-[1.02]">
+            <div class="flex-grow">
+              <h4 class="text-2xl font-bold text-slate-900 mb-4">Lite</h4>
+              <div class="text-4xl font-bold text-slate-900 mb-6">$10<span class="text-lg font-normal text-slate-600">/month</span></div>
+              <ul class="space-y-4 mb-8">
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg"><strong>Basic Intelligence</strong></span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Audio and Text Access</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Basic Narrative Experience</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Includes <strong>12 Hours</strong></span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Up to 2 Games</span>
+                </li>
+              </ul>
+            </div>
+            {% if request.user.is_authenticated %}
+              {% if current_plan == 'lite' %}
+                <a href="#" class="inline-flex items-center justify-center w-full px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition-colors">
+                  <i class="fas fa-credit-card mr-2"></i>
+                  Manage Subscription
+                </a>
+              {% elif current_plan == 'plus' or current_plan == 'pro' %}
+                <form method="post" action="{% url 'billing_checkout' 'lite' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-lg hover:shadow-xl">Downgrade to Lite</button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'billing_checkout' 'lite' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-lg hover:shadow-xl">Choose Lite</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'register' %}" class="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-lg hover:shadow-xl">Choose Lite</a>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Plus Plan -->
+        <div class="relative group">
+          {% if current_plan == 'lite' or current_plan == 'free' or not request.user.is_authenticated %}
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+            <span class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold shadow-xl px-6 py-3 text-sm whitespace-nowrap ring-4 ring-red-100">Most Popular</span>
+          </div>
+          {% endif %}
+          <div class="bg-gradient-to-br from-white to-red-50/30 p-8 rounded-2xl border-2 border-red-200 hover:border-red-300 hover:shadow-2xl transition-all duration-300 h-full flex flex-col group-hover:scale-[1.02] ring-4 ring-red-50">
+            <div class="flex-grow">
+              <h4 class="text-2xl font-bold text-slate-900 mb-4">Plus</h4>
+              <div class="text-4xl font-bold text-slate-900 mb-6">$25<span class="text-lg font-normal text-slate-600">/month</span></div>
+              <ul class="space-y-4 mb-8">
+                <li class="flex items-center text-slate-700">
+                  <span class="text-lg">Everything in Lite</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-transparent font-semibold">Advanced Intelligence</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Access to <strong>Sound Effects</strong></span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Access to <strong>Visual Gameplay</strong></span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Includes <strong>30 Hours</strong></span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Up to 5 Games</span>
+                </li>
+              </ul>
+            </div>
+            {% if request.user.is_authenticated %}
+              {% if current_plan == 'plus' %}
+                <a href="#" class="inline-flex items-center justify-center w-full px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition-colors">
+                  <i class="fas fa-credit-card mr-2"></i>
+                  Manage Subscription
+                </a>
+              {% elif current_plan == 'lite' %}
+                <form method="post" action="{% url 'billing_checkout' 'plus' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02]">Upgrade to Plus</button>
+                </form>
+              {% elif current_plan == 'pro' %}
+                <form method="post" action="{% url 'billing_checkout' 'plus' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02]">Downgrade to Plus</button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'billing_checkout' 'plus' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02]">Choose Plus</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'register' %}" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02]">Choose Plus</a>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Pro Plan -->
+        <div class="relative group">
+          <div class="bg-gradient-to-br from-white to-purple-50/50 p-8 rounded-2xl border border-slate-200 hover:border-purple-300 hover:shadow-xl transition-all duration-300 h-full flex flex-col group-hover:scale-[1.02]">
+            <div class="flex-grow">
+              <h4 class="text-2xl font-bold text-slate-900 mb-4">Pro</h4>
+              <div class="text-4xl font-bold text-slate-900 mb-6">$45<span class="text-lg font-normal text-slate-600">/month</span></div>
+              <ul class="space-y-4 mb-8">
+                <li class="flex items-center text-slate-700">
+                  <span class="text-lg">Everything in Plus</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg"><strong>2x</strong> more visuals</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Experimental Features (Multiplayer and more)</span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Includes <strong>90 Hours</strong></span>
+                </li>
+                <li class="flex items-center text-slate-700">
+                  <span class="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full mr-4 flex-shrink-0"></span>
+                  <span class="text-lg">Up to 20 Games</span>
+                </li>
+              </ul>
+            </div>
+            {% if request.user.is_authenticated %}
+              {% if current_plan == 'pro' %}
+                <a href="#" class="inline-flex items-center justify-center w-full px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition-colors">
+                  <i class="fas fa-credit-card mr-2"></i>
+                  Manage Subscription
+                </a>
+              {% elif current_plan == 'lite' or current_plan == 'plus' %}
+                <form method="post" action="{% url 'billing_checkout' 'pro' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-lg hover:shadow-xl">Upgrade to Pro</button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'billing_checkout' 'pro' %}" onsubmit="return startCheckout(event, this);">
+                  {% csrf_token %}
+                  <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-lg hover:shadow-xl">Choose Pro</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'register' %}" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 text-center block select-none cursor-pointer shadow-lg hover:shadow-xl">Choose Pro</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-24 bg-gradient-to-br from-slate-100 via-blue-50 to-teal-50">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-slate-800 mb-6 fade-in-up">Pricing Questions</h2>
+        <p class="text-xl text-slate-600 max-w-3xl mx-auto fade-in-up">Everything you need to know about our plans</p>
+      </div>
+      <div class="max-w-4xl mx-auto">
+        <div class="space-y-8">
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>Can I upgrade or downgrade my plan anytime?</span>
+              <svg class="w-5 h-5 text-slate-500 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">Yes. Upgrade or downgrade anytime; changes take effect per billing cycle.</div>
+          </details>
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>What happens to my games if I downgrade?</span>
+              <svg class="w-5 h-5 text-slate-500 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">Your games remain safe. Excess games get archived until you upgrade or free slots.</div>
+          </details>
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>Is there a free trial?</span>
+              <svg class="w-5 h-5 text-slate-500 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">You can try our demo to get a feel for the game for free without an account.</div>
+          </details>
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>What payment methods do you accept?</span>
+              <svg class="w-5 h-5 text-slate-500 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">All major cards are accepted via secure processing.</div>
+          </details>
+          <details class="faq-card bg-gradient-to-br from-white to-slate-50/50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-slate-100 hover:border-slate-200">
+            <summary class="flex justify-between items-center cursor-pointer text-xl font-bold text-slate-800 list-none hover:text-blue-600 transition-colors">
+              <span>Can I cancel my subscription?</span>
+              <svg class="w-5 h-5 text-slate-500 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="mt-6 text-slate-700 text-lg leading-relaxed">Yes. Cancel anytime from your account settings. Access until the end of the period.</div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-b from-slate-800 to-slate-900 text-slate-300 py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center mb-6">
+            <img class="landing-logo h-10 w-10 mr-3" src="{% static 'images/logo_black.png' %}" alt="Eternalore Logo" loading="lazy">
+            <span class="text-2xl font-bold text-white">Eternalore</span>
+          </div>
+          <p class="text-slate-400 mb-6">AI-powered interactive Roleplaying that brings your imagination to life.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-slate-400 hover:text-white transition-colors" aria-label="Twitter">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+            </a>
+            <a href="#" class="text-slate-400 hover:text-white transition-colors" aria-label="Discord">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.210.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.010c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.120.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.360.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold mb-4">Product</h3>
+          <ul class="space-y-2">
+            <li><a href="{% url 'landing_page' %}#features" class="hover:text-white transition-colors">Features</a></li>
+            <li><a href="{% url 'landing_page' %}#pricing" class="hover:text-white transition-colors">Pricing</a></li>
+            <li><a href="{% url 'landing_page' %}#demo" class="hover:text-white transition-colors">Demo</a></li>
+            <li><a href="{% url 'pricing' %}" class="hover:text-white transition-colors">Pricing</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold mb-4">Support</h3>
+          <ul class="space-y-2">
+            <li><a href="{% url 'support' %}" class="hover:text-white transition-colors">Help Center</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold mb-4">Company</h3>
+          <ul class="space-y-2">
+            <li><a href="{% url 'privacy' %}" class="hover:text-white transition-colors">Privacy</a></li>
+            <li><a href="{% url 'terms' %}" class="hover:text-white transition-colors">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-slate-700 mt-12 pt-8 text-center">
+        <p class="text-slate-400">&copy; 2025 Eternalore. All rights reserved. Made with passion.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    async function startCheckout(ev, form) {
+      ev.preventDefault();
+      try {
+        const resp = await fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Accept': 'application/json',
+            'X-Requested-With': 'fetch'
+          },
+          credentials: 'same-origin'
+        });
+
+        const contentType = resp.headers.get('content-type') || '';
+
+        // If user is redirected (e.g., to login) or response is HTML, navigate to the destination
+        if (resp.redirected || (!contentType.includes('application/json') && resp.ok)) {
+          window.location.href = resp.url || "{% url 'login' %}";
+          return false;
+        }
+
+        let data = null;
+        if (contentType.includes('application/json')) {
+          data = await resp.json();
+        }
+
+        if (data && data.ok && data.url) {
+          window.location.href = data.url;
+          return false;
+        }
+
+        if (resp.status === 401 || resp.status === 403) {
+          window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname);
+          return false;
+        }
+
+        const message = (data && (data.error || data.detail)) || 'Checkout could not be started.';
+        alert(message);
+      } catch (e) {
+        // If something unexpected happens (like parsing HTML as JSON), send user to login as a safe fallback
+        window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname);
+      }
+      return false;
+    }
+    // Sticky only; contrast toggle at pricing section edge
+    (function(){
+      try {
+        const nav = document.getElementById('navbar');
+        const lightSection = document.getElementById('pricing');
+        if (!nav || !lightSection) return;
+        function updateContrast(){
+          const navH = nav.offsetHeight || 0;
+          const threshold = Math.max(0, (lightSection.offsetTop || 0) - navH);
+          const useDark = window.scrollY >= threshold;
+          if (useDark) {
+            nav.classList.add('navbar-contrast-dark');
+            nav.classList.remove('navbar-contrast-light');
+          } else {
+            nav.classList.add('navbar-contrast-light');
+            nav.classList.remove('navbar-contrast-dark');
+          }
+        }
+        updateContrast();
+        window.addEventListener('scroll', updateContrast, { passive: true });
+        window.addEventListener('resize', updateContrast);
+      } catch(_) {}
+    })();
+
+    // Make FAQ cards fully clickable
+    document.addEventListener('DOMContentLoaded', function() {
+      const faqCards = document.querySelectorAll('.faq-card');
+      
+      faqCards.forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          // Don't interfere if clicking directly on the summary element or its children
+          const summary = card.querySelector('summary');
+          if (summary && summary.contains(e.target)) {
+            return; // Let the browser handle the default summary click
+          }
+          
+          // If clicking elsewhere on the card, toggle the details element
+          if (card.hasAttribute('open')) {
+            card.removeAttribute('open');
+          } else {
+            card.setAttribute('open', '');
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}
+
+
